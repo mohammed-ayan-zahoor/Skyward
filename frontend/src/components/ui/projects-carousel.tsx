@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight } from "reicon-react";
 
 interface ProjectItem {
   id: string;
@@ -184,7 +184,7 @@ export function ProjectsCarousel() {
               }`}
               aria-label="Previous slide"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => scroll("right")}
@@ -196,7 +196,7 @@ export function ProjectsCarousel() {
               }`}
               aria-label="Next slide"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5" />
             </button>
           </div>
         </div>

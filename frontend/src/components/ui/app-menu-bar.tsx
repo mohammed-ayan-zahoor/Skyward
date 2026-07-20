@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/menubar";
 import {
   Folder,
-  Info,
-  Mail,
+  Information,
+  Envelope,
   FileText,
-  MapPin,
+  Location,
   ShieldAlert,
   ArrowRight,
-} from "lucide-react";
+} from "reicon-react";
 
 export default function AppMenuBar() {
   return (
@@ -62,13 +62,13 @@ export default function AppMenuBar() {
       {/* Company Menu */}
       <MenubarMenu>
         <MenubarTrigger className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors duration-150 rounded-full">
-          <Info className="w-4 h-4 text-blue-600" />
+          <Information className="w-4 h-4 text-blue-600" />
           Company
         </MenubarTrigger>
         <MenubarContent className="w-52 rounded-[2px]">
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/about" className="flex items-center gap-2">
-              <Info className="w-4 h-4" />
+              <Information className="w-4 h-4" />
               About Skyward
             </Link>
           </MenubarItem>
@@ -93,19 +93,19 @@ export default function AppMenuBar() {
       {/* Contact Menu */}
       <MenubarMenu>
         <MenubarTrigger className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors duration-150 rounded-full">
-          <Mail className="w-4 h-4 text-blue-600" />
+          <Envelope className="w-4 h-4 text-blue-600" />
           Contact
         </MenubarTrigger>
         <MenubarContent className="w-52 rounded-[2px]">
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/#contact" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
+              <Envelope className="w-4 h-4" />
               Request a Quote
             </Link>
           </MenubarItem>
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/#location" className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
+              <Location className="w-4 h-4" />
               Office Location
             </Link>
           </MenubarItem>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MapPin, Wrench, Calendar } from "lucide-react";
+import { ArrowRight, Location, Setting, Calendar } from "reicon-react";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 interface ProjectItem {
@@ -138,11 +138,11 @@ export default function GalleryPage() {
                 {/* Tech Specs Monospace Badges */}
                 <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                   <div className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                    <Location className="w-3.5 h-3.5 text-slate-400" />
                     <span>{project.location}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Wrench className="w-3.5 h-3.5 text-slate-400" />
+                    <Setting className="w-3.5 h-3.5 text-slate-400" />
                     <span>{project.type}</span>
                   </div>
                   <div className="flex items-center gap-1">

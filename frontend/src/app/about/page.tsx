@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Asterisk } from "lucide-react";
+import { ArrowRight, Star } from "reicon-react";
 
 export default function AboutPage() {
   const heroImage = "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=1200&h=500&q=80";
@@ -11,7 +11,7 @@ export default function AboutPage() {
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Asterisk className="w-5 h-5 text-accent animate-spin-slow" strokeWidth={2.5} />
+            <Star className="w-5 h-5 text-accent animate-spin-slow" />
             <span className="text-xs font-bold tracking-[0.2em] text-slate-800 font-mono">WHO WE ARE</span>
           </div>
           <div className="flex items-center gap-2">

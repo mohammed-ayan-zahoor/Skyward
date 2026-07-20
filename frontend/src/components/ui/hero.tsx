@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Folder, ArrowRight } from "lucide-react";
+import { Folder, ArrowRight } from "reicon-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 export function Hero() {

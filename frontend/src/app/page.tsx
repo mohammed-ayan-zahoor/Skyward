@@ -6,7 +6,7 @@ import { Testimonials } from "@/components/ui/testimonials";
 import { ConsultationForm } from "@/components/ui/consultation-form";
 import BusinessMap from "@/components/ui/business-map";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { ShieldCheck, Zap, Activity } from "lucide-react";
+import { ShieldCheck, Flash, Activity } from "reicon-react";
 
 export default function Home() {
   return (
@@ -32,7 +32,7 @@ export default function Home() {
               {/* Feature 1 */}
               <div className="flex flex-col items-start text-left gap-4">
                 <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 text-blue-600">
-                  <Zap className="w-6 h-6" />
+                  <Flash className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Rapid Construction</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-sans">

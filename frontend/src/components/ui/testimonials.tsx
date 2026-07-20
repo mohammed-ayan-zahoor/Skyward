@@ -1,4 +1,4 @@
-import { Quote, Star } from "lucide-react";
+import { QuoteUp, Star } from "reicon-react";
 
 interface TestimonialItem {
   id: number;
@@ -53,7 +53,7 @@ export function Testimonials() {
             WHAT OUR CLIENTS ARE SAYING
           </h2>
           {/* Subheading */}
-          <p className="max-w-2xl mx-auto text-slate-600 font-sans text-sm md:text-base leading-relaxed">
+          <p className="max-w-2xl mx-auto text-slate-650 font-sans text-sm md:text-base leading-relaxed">
             Read how our stamped structural engineering drawings, rapid steel fabrication, and on-site assembly guides help fuel retailers launch successfully.
           </p>
         </div>
@@ -79,7 +79,7 @@ export function Testimonials() {
                   </div>
                 </div>
                 {/* Clean quote vector representation */}
-                <Quote className="w-5 h-5 text-accent/40 flex-none" />
+                <QuoteUp className="w-5 h-5 text-accent/40 flex-none" />
               </div>
 
               {/* Large Card Image */}

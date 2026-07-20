@@ -1,7 +1,7 @@
 "use client";
 
 import { Map, MapMarker, MarkerContent, MarkerPopup, MapControls } from "@/components/ui/map";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Location, Phone, Envelope, Clock } from "reicon-react";
 
 interface BusinessMapProps {
   /** Longitude for the map center and marker (defaults to Whitefield, Bengaluru: 77.7500) */
@@ -58,7 +58,7 @@ export default function BusinessMap({
             <MapMarker longitude={longitude} latitude={latitude}>
               <MarkerContent>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white shadow-md border-2 border-white cursor-pointer hover:scale-110 transition-transform duration-150">
-                  <MapPin className="h-5 w-5" />
+                  <Location className="h-5 w-5" />
                 </div>
               </MarkerContent>
               <MarkerPopup>
@@ -79,7 +79,7 @@ export default function BusinessMap({
         {/* Address */}
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-[4px] bg-primary/5 border border-primary/10 text-primary">
-            <MapPin className="w-5 h-5" />
+            <Location className="w-5 h-5" />
           </div>
           <div>
             <h4 className="font-heading text-primary uppercase text-sm tracking-wider">Business Address</h4>
@@ -107,7 +107,7 @@ export default function BusinessMap({
         {/* Contact info */}
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-[4px] bg-primary/5 border border-primary/10 text-primary">
-            <Mail className="w-5 h-5" />
+            <Envelope className="w-5 h-5" />
           </div>
           <div>
             <h4 className="font-heading text-primary uppercase text-sm tracking-wider">Get in Touch</h4>

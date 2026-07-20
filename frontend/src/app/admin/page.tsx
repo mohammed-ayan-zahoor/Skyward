@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Terminal, ShieldCheck } from "lucide-react";
+import { BrowserTerminal, ShieldCheck } from "reicon-react";
 
 export default function AdminLoginPage() {
   const [identifier, setIdentifier] = useState("ID-402-BASE");
@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
         {/* Console Header */}
         <header className="mb-8">
           <div className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-accent animate-pulse" />
+            <BrowserTerminal className="w-4 h-4 text-accent animate-pulse" />
             <span className="font-mono text-[10px] tracking-[0.25em] text-accent uppercase font-bold">
               CONSOLE DECK: SW-902
             </span>

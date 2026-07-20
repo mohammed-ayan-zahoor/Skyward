@@ -17,7 +17,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
-import { X, Minus, Plus, Locate, Maximize, Loader2 } from "lucide-react";
+import { X, Minus, Plus, Gps, Maximize, Loader } from "reicon-react";
 
 import { cn } from "@/lib/utils";
 
@@ -944,9 +944,9 @@ function MapControls({
             disabled={waitingForLocation}
           >
             {waitingForLocation ? (
-              <Loader2 className="size-4 animate-spin" />
+              <Loader className="size-4 animate-spin" />
             ) : (
-              <Locate className="size-4" />
+              <Gps className="size-4" />
             )}
           </ControlButton>
         </ControlGroup>
