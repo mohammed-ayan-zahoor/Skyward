@@ -95,7 +95,7 @@ export function Hero() {
             />
           </div>
           
-          <div className="max-w-xl md:mr-[480px] lg:mr-auto">
+          <div className="max-w-xl md:mr-[540px] lg:mr-auto">
             {/* Title */}
             <h3 className="text-2xl font-heading text-primary uppercase tracking-wide">Engineering Excellence</h3>
             {/* Divider */}
@@ -107,21 +107,21 @@ export function Hero() {
             </p>
           </div>
           
-          {/* Image - high quality gas station canopy photo from Unsplash */}
+          {/* Image - high quality gas station canopy photo */}
           {shouldReduceMotion ? (
             <img
-              src="https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=600&h=600&q=80"
-              alt="Structural steel petrol station canopy"
-              className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[420px] object-cover md:absolute md:mt-0 md:h-[420px] md:bottom-0 md:right-0"
+              src="https://petrolpumpcanopy.in/wp-content/uploads/2025/08/iocl-pump-canopy.jpg"
+              alt="IOCL petrol station canopy by Skyward"
+              className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[480px] object-cover md:absolute md:mt-0 md:h-[480px] md:bottom-0 md:right-0"
             />
           ) : (
             <motion.img
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ ...transition, delay: 0.25 }}
-              src="https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=600&h=600&q=80"
-              alt="Structural steel petrol station canopy"
-              className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[420px] object-cover md:absolute md:mt-0 md:h-[420px] md:bottom-0 md:right-0"
+              src="https://petrolpumpcanopy.in/wp-content/uploads/2025/08/iocl-pump-canopy.jpg"
+              alt="IOCL petrol station canopy by Skyward"
+              className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[480px] object-cover md:absolute md:mt-0 md:h-[480px] md:bottom-0 md:right-0"
             />
           )}
         </div>
