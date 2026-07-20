@@ -1,0 +1,50 @@
+## Design direction — read this before writing any UI code
+
+This is an industrial B2B site for a canopy fabricator, not a SaaS product or lifestyle brand. The design should feel like proof of engineering credibility — steady, structural, unglamorous in a good way. The audience is petrol station owners and oil company procurement teams, not consumers.
+
+## Color palette (use exactly these, nothing else)
+
+- `#1C2B36` — deep steel/charcoal blue — primary dark, headers, nav
+- `#F5F3EE` — warm off-white — main background (not pure white, not cream-beige-SaaS-default)
+- `#E8891C` — safety-amber — accent, CTAs, active states (nods to fuel/industrial signage, used sparingly)
+- `#4A5A63` — muted slate — secondary text, borders, dividers
+- `#0F1720` — near-black — body text
+- `#FFFFFF` — used only inside cards/panels where contrast against off-white is needed
+
+## Type
+
+- Display/headings: a condensed or geometric sans with some structural weight — e.g. **Barlow Condensed** or **Archivo** — used bold, tight letter-spacing, never decorative
+- Body: a clean, neutral sans — e.g. **Inter** or **Source Sans 3**
+- Data/captions (specs, locations, dates in gallery): a monospace or semi-mono face — e.g. **IBM Plex Mono** — used small, for labels like "Location · Bengaluru" or "2023" to give it a technical-spec feel
+- Max 2 font families total. No script/serif faces anywhere.
+
+## Layout rules
+
+- Grid-based, sharp edges. **Subtle border-radius is allowed — 2px on content cards and images, 4px on interactive elements (buttons, input fields, tags/pills).** Structural containers (nav, hero, full-width sections) stay sharp (0px). Avoid large rounded corners (8px+) combined with drop shadows.
+- No drop shadows on static content. Cards, images, and sections are separated by **hairline borders** (`1px solid #4A5A63` at low opacity) or whitespace, not shadow.
+- Hover states change **color, underline, or a 1px border**, never shadow size. A photo in the gallery can scale slightly (1.02x) or shift a caption into view on hover — not glow.
+- Section backgrounds alternate between `#F5F3EE` and `#1C2B36` (dark section) to create rhythm — don't stack more than 2-3 identical light sections in a row.
+- Gallery grid: masonry or fixed-ratio grid, not uniform square Instagram-style tiles — vary tile size slightly so featured installations feel bigger/more important.
+
+## Signature element
+
+Every installation detail page shows key facts (location, canopy type, year, client) as a **spec plate** — a small structured data block styled like an equipment nameplate: monospace labels, thin dividers between fields, laid out in a fixed grid. This is the one recurring visual idea that ties the whole site together and reflects the subject matter (structural/industrial), instead of a generic "info card."
+
+## Explicit anti-patterns — do not do these
+
+- Do NOT wrap every section/block in a rounded div with `box-shadow` that increases on hover
+- Do NOT use a centered hero with a gradient blob background
+- Do NOT use identical icon-in-a-circle + heading + paragraph "feature cards" repeated 3x
+- Do NOT use numbered badges (01 / 02 / 03) unless the content is a genuine sequence
+- Do NOT default to purple/blue SaaS gradients or Anthropic-orange (`#D97757`) — this palette is locked above
+- Do NOT animate more than one thing per view on scroll — pick one moment (e.g. gallery images fading in) and leave the rest static
+
+## Admin panel note
+
+Reuse the exact same tokens (colors, type, spacing) from the public site. The admin panel should look like the back office of the same company, not a different, uglier app bolted on. Tables get hairline row dividers, not alternating card shadows. Forms use the same input styling as the public contact form.
+
+## Responsive & accessibility floor
+
+- Test down to 375px width — gallery grid should collapse to single column, spec plate should stack
+- Visible keyboard focus states using the amber accent (`#E8891C` outline)
+- Respect `prefers-reduced-motion` — disable hover scale/fade animations if set

@@ -1,0 +1,62 @@
+> **Note (superseded):** The Products/Catalog section below reflects the original first draft. After a pivot, the site is gallery-only — no product catalog. The current model is in `data_model`. Ignore any Products/Catalog references in this file.
+
+we need to create a site, help me with planning, its for a business named "Skyward" that provides the service of roof that we see in petrol pumps, he wants a place to showcase his work
+
+
+
+## 1. Define the site structure first
+
+**Public site:**
+- **Home** — hero (a real photo/render of a canopy installation, not a stock gradient), what Skyward does, a few flagship projects, trust signals (years in business, number of installations, clients like oil companies), CTA to catalog or contact
+- **Products/Catalog** — the different canopy types (cantilever, flat, curved, branded fascia, etc.), each with specs (dimensions, materials, load capacity, wind rating), images/drawings, and a "request quote" action
+- **Product detail page** — per-product specs, gallery, downloadable spec sheet (PDF), related products
+- **Projects/Portfolio** — case studies of actual installations (before/after, client, location)
+- **About** — company story, certifications, manufacturing capability
+- **Contact/Quote request** — form that feeds into the admin panel
+
+**Admin panel (private):**
+- Login
+- Product management (create/edit/delete products, upload images, set specs, mark featured)
+- Project/portfolio management (add case studies)
+- Lead/inquiry management (view quote requests, mark status: new/contacted/closed)
+- Maybe basic media library for images/PDFs
+
+## 2. Nail down the data model before coding
+
+Products need: name, category, description, specs (structured fields, not a blob of text), images (multiple), spec sheet PDF, status (published/draft), featured flag. Get this right first — it's the backbone the agent will build both the public catalog and admin CRUD screens around, and it's much cheaper to fix now than after the UI exists.
+
+## 3. Now, the UI problem — this is the important part
+
+The rounded-div-shadow-on-hover pattern happens because you're giving the agent a *feature list* instead of a *design system*. Without explicit direction, it falls back to the same three or four templated looks every AI defaults to. You need to hand it constraints, not just content.
+
+Here's what to give your agent **before** it writes a single line of UI code:
+
+**A. A concrete visual direction, not "make it professional"**
+"Professional" means nothing to a model. Instead specify:
+- A real color palette: 4–6 named hex values (e.g., a deep steel blue, a warm safety-orange or amber accent that nods to fuel/industrial contexts, off-white background, charcoal text — something that actually connects to *petrol station canopies*, not a generic SaaS palette)
+- Two typefaces max: one for headings with some industrial/structural character, one clean body face
+- A layout concept in plain language: e.g. "grid-based, structural, sharp corners, hairline dividers — like an engineering spec sheet, not a lifestyle brand"
+
+**B. Explicitly ban the default pattern**
+Literally tell it:
+- "Do not wrap every section in a rounded card with a drop shadow"
+- "Use border-radius sparingly and only on interactive elements like buttons, not on every container"
+- "Avoid shadow-grows-on-hover as the default hover state — use color, underline, or border changes instead"
+- "Vary section backgrounds and layout instead of stacking identical cards"
+
+**C. Give it a signature element**
+One deliberate, memorable design idea tied to the actual business — e.g., product specs displayed like a technical data plate, or a diagram-style layout for canopy dimensions, or using structural line-drawings as a recurring visual motif. This single choice does more to kill the "generic AI site" feeling than any amount of polish elsewhere.
+
+**D. Ask for a design plan before code**
+Don't let the agent jump straight to building. Ask it to first write out: the exact hex palette, the two typefaces, the layout approach per page, and the one signature element. Review *that* plan yourself — if it sounds like it could belong to any SaaS landing page, send it back before any code gets written. This is way cheaper to fix at the plan stage than after 500 lines of JSX.
+
+## 4. Suggested order of work
+
+1. Lock the data model (products, projects, leads)
+2. Get the design plan (palette/type/layout/signature) approved before code
+3. Build the public catalog pages against real (even placeholder) product data
+4. Build the admin CRUD screens — deliberately reuse the same design tokens so admin doesn't look like a different, uglier app
+5. Wire up the contact/quote form to actually create a lead in the admin panel
+6. Auth for the admin panel last, once the screens exist
+
+Want me to turn this into an actual written brief/prompt you can hand directly to your coding agent (palette, type, layout rules, page-by-page spec)? That would probably do more than anything else to fix the sloppy-UI problem, since the agent will have explicit constraints instead of defaulting to templates.

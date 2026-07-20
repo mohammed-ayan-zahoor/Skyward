@@ -1,0 +1,53 @@
+## Tech stack — locked decisions
+
+This is the fifth planning file, alongside `initial planning`, `data_model`, `site_structure`, and `design_brief`. Follow this exactly for framework, library, and architecture choices — don't substitute alternatives without checking first.
+
+## Architecture
+
+- **Frontend**: Next.js (React) — file-based routing, server-side rendering for SEO on installation detail pages, needed as the base for Framer Motion
+- **Backend**: Express — pure API layer, no server-rendered HTML. Handles `/api/installations`, `/api/photos`, `/api/leads`, `/api/auth`
+- **Database**: PostgreSQL
+- **ORM**: Prisma — type-safe queries, handles migrations as schema evolves
+- **Image storage**: on disk on the VPS, under `/uploads/installations/{installation_id}/`, not stored in the DB itself. DB stores the file path/URL only.
+
+Frontend and backend run as two separate processes on the same VPS, managed by PM2, with Nginx as reverse proxy routing `/api/*` to Express and everything else to Next.js. SSL via Let's Encrypt/Certbot once the client's domain is pointed at the VPS.
+
+## Auth (admin panel only)
+
+- Single admin user stored in the DB with a **bcrypt-hashed password** — never plaintext, never hardcoded in source
+- Login route validates the hash and issues a **JWT**
+- JWT stored in an **httpOnly cookie** (not localStorage — protects against XSS token theft)
+- Express middleware validates the JWT on all `/admin/*` and protected `/api/*` routes
+- JWT secret and DB credentials live in `.env`, which is gitignored and never committed
+
+## Animation
+
+- **Framer Motion** — the default for all animation: scroll-triggered reveals (`whileInView`), page/route transitions (`AnimatePresence`), hover/tap micro-interactions, layout animation (e.g. gallery grid reflow on filter change).
+- **GSAP** (+ ScrollTrigger) — **conditional, do not install on day one.** Pull it in only if you hit a specific choreographed sequence Framer Motion genuinely can't handle (most likely candidate: a multi-element hero reveal on a timeline). Add it at that point, for that sequence only.
+- Rule: one animation library per element, never both on the same thing. If GSAP is added, Framer Motion for "this appears/reacts," GSAP for "this sequence happens together on a timeline."
+- All animation durations and easing curves live in a single shared constants file so motion feels consistent across the site, not scattered — one orchestrated feel, not effects-per-component.
+- Respect `prefers-reduced-motion` — disable non-essential motion when set (already noted in design brief, repeated here since it applies to both libraries).
+
+## Packages to install
+
+```
+npm install next react react-dom framer-motion
+npm install express prisma @prisma/client bcrypt jsonwebtoken cookie-parser cors
+```
+
+> `gsap` is not installed by default — add it only when you have a concrete sequence that requires it.
+
+## Build order recap (from earlier planning)
+
+1. Scaffold + Prisma schema from `data_model.md` — no UI yet
+2. Write `prisma/seed.ts` — 3–4 fake installations with placeholder images (1-photo and 12-photo cases to stress the layout). Run it immediately after `prisma migrate dev` so every page is built against real data, not empty state.
+3. Express API routes for installations, photos, leads, auth
+4. First Next.js page (Gallery) styled per `design_brief.md` — check against anti-patterns before continuing
+5. Build outward: Home → Installation detail → About/Contact → Admin panel
+6. Layer in Framer Motion (scroll reveals, route transitions) once static pages are approved, then GSAP only if a specific sequence demands it (see Animation section above)
+
+## Hosting
+
+- Client-owned domain, pointed at your VPS
+- VPS runs both processes via PM2, Nginx reverse proxy, Let's Encrypt SSL
+- No third-party hosting platform (Vercel/Netlify/etc.) — everything self-hosted per your existing VPS arrangement

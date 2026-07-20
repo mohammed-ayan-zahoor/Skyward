@@ -1,0 +1,48 @@
+## Core entities
+
+**Installation** (the main object — one canopy project at one location)
+- `id`
+- `title` — e.g. "IOCL Fuel Station, Whitefield"
+- `slug` — for the URL
+- `location` — city/region (used for filtering, and gives the site a "we're everywhere" feel)
+- `client` / `brand` — the petrol company (IOCL, HPCL, Shell, etc.) — optional if he wants to name clients
+- `canopy_type` — e.g. cantilever, flat-roof, curved, branded fascia — even without a catalog, this is useful as a filter tag
+- `year_completed`
+- `description` — short story of the project (span, materials, anything notable)
+- `cover_image_id` — which photo represents this project in grid/thumbnail views
+- `is_featured` — boolean, to pin standout projects to the homepage
+- `status` — published / draft (so admin can prep before it goes live)
+- `created_at`, `updated_at`
+
+**Photo** (belongs to an Installation — one-to-many)
+- `id`
+- `installation_id` — foreign key
+- `image_url`
+- `caption` — optional, e.g. "Night view showing LED fascia lighting"
+- `sort_order` — so admin can control gallery order per project
+- `is_cover` — flag if this is the one used as thumbnail
+
+**Tag** (optional, many-to-many with Installation)
+- `id`, `name` — lets you filter by things beyond location/type, e.g. "LED branding," "large-span," "highway station" — only add this if he wants filterable gallery, otherwise skip it for simplicity
+
+**Inquiry / Lead** (from the contact/quote form — unrelated to gallery but still needed)
+- `id`, `name`, `phone`, `email`, `message`, `submitted_at`, `status` (new/contacted/closed)
+
+**User** (admin login — single user for now)
+- `id`, `email`, `password_hash`, `role` (default `"admin"`) — `role` costs nothing now and avoids a migration if staff logins are ever added
+- `ponytail:` single-admin assumption is baked in; adding multi-staff later needs a role-check middleware pass
+
+## Why structured this way
+
+- Making **Photo** its own table (not just an array of URLs on Installation) means the admin panel can reorder photos, set captions, and pick a cover image independently — this is what makes the gallery feel curated instead of a raw dump.
+- `canopy_type` and `location` as structured fields (not free text buried in the description) is what lets the public gallery have real filters — "show me curved canopies" or "show me projects in Bangalore" — without you needing a full product catalog.
+- `is_featured` + `status` give the admin control over what's shown on the homepage vs. buried deeper in the full gallery, without needing to delete anything.
+
+## Pages this supports
+
+- **Homepage** — featured installations grid, pulling `is_featured = true`
+- **Gallery/Projects page** — full grid of all published installations, filterable by `location` / `canopy_type`
+- **Installation detail page** — the photo gallery for that one project + description + client + year
+- **Admin: Installations list** — CRUD, toggle featured/published
+- **Admin: Installation editor** — upload/reorder/caption photos, set fields
+- **Admin: Leads inbox** — view/manage form submissions

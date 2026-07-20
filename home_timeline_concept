@@ -1,0 +1,86 @@
+# Home Page — Scroll-Driven Timeline Concept
+
+## The core idea
+
+A vertical timeline lives on the left side of the Home page. It's represented by a curved line — a gentle arc, not straight — that acts as a visual time axis. As the user scrolls down the page, this is an interactive dial. On the right side of the screen, one installation's photo is shown at a time, and as the user scrolls, the photo for the "current" installation fades in while the previous one fades out. The whole thing is meant to feel like a mechanical dial or vault lock — you turn it (scroll), and it clicks into positions (installations), rather than smoothly gliding proportional to pixel scroll distance.
+
+This is the signature/orchestrated moment for the site — the one deliberate, memorable interaction tied to the business itself (canopies built over years, across locations), consistent with the "one signature element" rule from the design brief.
+
+---
+
+## Layout
+
+- **Left column (~1/3 of viewport width):** the curved SVG line, running top to bottom of the section. Year labels (2022, 2023, 2024…) sit at points along this curve, spaced according to installations. Pulled dynamically from `year_completed` — not hardcoded.
+- **Right column (remaining width):** a single large image area. Only one installation's cover photo is meaningfully visible at a time.
+- **A marker** (dot or small perpendicular line) sits on the curve indicating "you are here" — it snaps per step as the user scrolls.
+- The section is pinned in the viewport while scroll drives the animation internally (GSAP `pin: true`).
+
+---
+
+## Interaction model — dial, not scrub
+
+Two paradigms:
+1. **Scrub (continuous):** animation progress = scroll position, 1:1.
+2. **Snap (discrete, stepped):** scroll accumulates, crosses a threshold, snaps to next state — like a vault dial clicking into notches.
+
+**This uses #2.** Every "notch" on the dial = one installation in the timeline.
+
+---
+
+## Detailed Step Behavior
+
+### While scrolling, before snap threshold:
+- The marker moves slightly with a small lag/resistance (physical weight feel, not 1:1).
+- The current image may begin to fade slightly, giving anticipatory feedback.
+
+### When snap threshold is crossed:
+- The marker settles with a **small overshoot + bounce-back** (spring/elastic easing, not linear stop). This reads as "clicking into place."
+- The current step's year label does a quick **scale-punch**: 1.0 → 1.12 → 1.0, ~150-200ms. Mimics a mechanical counter landing on a new number.
+- The previous year label fades back to lower-emphasis (dimmer, smaller, less bold).
+
+### Image behavior per step:
+- Current installation's cover image fades to full opacity (+ optional subtle settle/scale).
+- Previous image cross-fades out (brief overlap, not hard-cut).
+- Adjacent steps can remain at low dimmed opacity as a preview (nice-to-have, not blocking).
+
+---
+
+## Data Binding
+
+- Number of steps = number of installations (filtered to `published`, likely `isFeatured` only — see Open Items).
+- Year labels = distinct `year_completed` values from those installations.
+- Each step uses: cover image, title, location, canopyType from the existing Installation data structure.
+
+---
+
+## Technical Implementation
+
+- **Library:** GSAP + ScrollTrigger (this is the choreographed multi-element case that `tech_stack.md` designates GSAP for, not Framer Motion).
+- **Pinning:** `pin: true` on the timeline section.
+- **Snap config:** `scrub: 0.3` (slight lag/weight), `snap: { snapTo: 1 / (steps - 1), duration: 0.4, ease: "power2.out" }` — tuned by feel once built.
+- **Curve path:** SVG `<path>` element. Marker position via GSAP `MotionPathPlugin`.
+- **Image cross-fade:** all images stacked absolutely in same container, opacity animated per-step. All preloaded upfront (small set, ~5-8 featured images).
+
+---
+
+## Scope Boundaries
+
+- **Home page only.** Gallery (`/work`) keeps its existing filterable grid unchanged.
+- Detail, About, Contact pages untouched.
+
+---
+
+## Open Items (to decide before build)
+
+| # | Decision | Options | Recommendation |
+|---|---|---|---|
+| 1 | Featured-only vs. all installations on Home timeline | Featured only / All published | **Featured only** — highlight reel, not duplicate of `/work` |
+| 2 | Step spacing on curve | Even spacing / Time-accurate (by year gap) | **Even spacing** — point is tactile interaction, not calendar accuracy |
+| 3 | Mobile behavior | Pinned dial (won't work on touch) / Vertical stack with fade / Horizontal swipe | Must decide before build — desktop-only risks broken mobile shipping by default |
+| 4 | Click sound in v1 | Include / Defer | **Defer** — bolt on after visual snap feels right |
+
+---
+
+## Sound (Deferred)
+
+A short quiet mechanical click on each snap would reinforce the tactile feel. Must respect browser autoplay restrictions (fire only after first user interaction) and be easily mutable. Scope: stretch/v2.

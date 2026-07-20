@@ -1,0 +1,42 @@
+## Public site
+
+- **Home**
+  - Hero — a strong photo of a flagship canopy installation (real photography, not stock/gradient), short line on what Skyward does
+  - Featured installations — grid pulling `is_featured = true`, 4–6 standout projects
+  - Trust signals — years in business, number of installations completed, clients served (brand logos if he's allowed to show them)
+  - CTA into the full gallery
+  - CTA to contact/quote
+
+- **Gallery / Our Work**
+  - Full grid of all published installations (cover photo + title + location + type)
+  - Filters by `location` and `canopy_type` (and `tag` if you add it)
+  - Clicking a project goes to its detail page
+
+- **Installation detail page** (per project)
+  - Photo gallery for that installation (ordered, with captions)
+  - Title, location, client/brand, canopy type, year completed, description
+  - "Enquire about a similar canopy" CTA linking to contact form
+
+- **About**
+  - Company story, manufacturing/installation capability, certifications, years of operation
+
+- **Contact / Get a Quote**
+  - Form (name, phone, email, message) → creates a Lead in admin
+  - Maybe a phone number / WhatsApp for direct contact, common for this kind of B2B industrial buyer
+
+## Admin panel (private, auth-protected)
+
+- **Login**
+- **Installations**
+  - List view — all projects, with published/draft and featured toggles visible inline
+  - Editor — add/edit title, slug, location, client, canopy type, year, description, status, featured flag
+  - Photo manager within each installation — upload photos, reorder (drag), caption, set cover image
+- **Leads / Enquiries**
+  - Inbox list of form submissions, status (new/contacted/closed), basic notes
+- **(Optional) Tags** — manage the tag list if you're using them for filtering
+
+## Decision still worth locking before build starts
+
+Individual detail pages per installation (as above) is the richer, more credible version — real petrol-company clients will want to see the specifics of a project before believing it's genuine. If he'd rather keep it lighter, you could collapse "Gallery" and "Installation detail" into one page with a lightbox, but you lose the ability to link/share a specific project and it hurts SEO (each installation with a real location name is a good long-tail search hit, e.g. "canopy fabricator Whitefield"). I'd recommend keeping the separate detail pages.
+
+This structure maps directly onto the data model from before — Installations drive Home, Gallery, and Detail pages; Photos drive the galleries within each; Leads drive the admin inbox. Ready for me to turn this into the actual design/build brief for your agent whenever you want it.
