@@ -25,13 +25,13 @@ export default function AppMenuBar() {
       {/* Works Menu */}
       <MenubarMenu>
         <MenubarTrigger className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors duration-150 rounded-full">
-          <Folder className="w-4 h-4 text-blue-600" />
+          <Folder className="w-4 h-4 text-blue-600" weight="Filled" />
           Installations
         </MenubarTrigger>
         <MenubarContent className="w-56 rounded-[2px]">
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/work" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
+              <FileText className="w-4 h-4" weight="Filled" />
               All Installations
             </Link>
           </MenubarItem>
@@ -62,19 +62,19 @@ export default function AppMenuBar() {
       {/* Company Menu */}
       <MenubarMenu>
         <MenubarTrigger className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors duration-150 rounded-full">
-          <Information className="w-4 h-4 text-blue-600" />
+          <Information className="w-4 h-4 text-blue-600" weight="Filled" />
           Company
         </MenubarTrigger>
         <MenubarContent className="w-52 rounded-[2px]">
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/about" className="flex items-center gap-2">
-              <Information className="w-4 h-4" />
+              <Information className="w-4 h-4" weight="Filled" />
               About Skyward
             </Link>
           </MenubarItem>
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/about#capabilities" className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
+              <FileText className="w-4 h-4" weight="Filled" />
               Our Capabilities
             </Link>
           </MenubarItem>
@@ -83,7 +83,7 @@ export default function AppMenuBar() {
           
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/admin" className="flex items-center gap-2 text-slate-500 hover:text-slate-900">
-              <ShieldAlert className="w-4 h-4" />
+              <ShieldAlert className="w-4 h-4" weight="Filled" />
               Admin Portal
             </Link>
           </MenubarItem>
@@ -93,19 +93,19 @@ export default function AppMenuBar() {
       {/* Contact Menu */}
       <MenubarMenu>
         <MenubarTrigger className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors duration-150 rounded-full">
-          <Envelope className="w-4 h-4 text-blue-600" />
+          <Envelope className="w-4 h-4 text-blue-600" weight="Filled" />
           Contact
         </MenubarTrigger>
         <MenubarContent className="w-52 rounded-[2px]">
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/#contact" className="flex items-center gap-2">
-              <Envelope className="w-4 h-4" />
+              <Envelope className="w-4 h-4" weight="Filled" />
               Request a Quote
             </Link>
           </MenubarItem>
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/#location" className="flex items-center gap-2">
-              <Location className="w-4 h-4" />
+              <Location className="w-4 h-4" weight="Filled" />
               Office Location
             </Link>
           </MenubarItem>

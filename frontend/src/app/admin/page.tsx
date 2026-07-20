@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
         {/* Console Header */}
         <header className="mb-8">
           <div className="flex items-center gap-2">
-            <BrowserTerminal className="w-4 h-4 text-accent animate-pulse" />
+            <BrowserTerminal className="w-4 h-4 text-accent animate-pulse" weight="Filled" />
             <span className="font-mono text-[10px] tracking-[0.25em] text-accent uppercase font-bold">
               CONSOLE DECK: SW-902
             </span>
@@ -108,7 +108,7 @@ export default function AdminLoginPage() {
 
       {/* Top right security badge */}
       <div className="absolute top-4 right-4 z-10 hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] bg-white/5 border border-white/10 text-white/50 text-[9px] font-mono tracking-widest uppercase">
-        <ShieldCheck className="w-3.5 h-3.5 text-accent" />
+        <ShieldCheck className="w-3.5 h-3.5 text-accent" weight="Filled" />
         SECURED SHELL
       </div>
 

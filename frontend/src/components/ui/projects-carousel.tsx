@@ -184,7 +184,7 @@ export function ProjectsCarousel() {
               }`}
               aria-label="Previous slide"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5" weight="Filled" />
             </button>
             <button
               onClick={() => scroll("right")}
@@ -196,7 +196,7 @@ export function ProjectsCarousel() {
               }`}
               aria-label="Next slide"
             >
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-5 h-5" weight="Filled" />
             </button>
           </div>
         </div>
@@ -243,7 +243,7 @@ export function ProjectsCarousel() {
                   className="inline-flex items-center gap-1 text-xs md:text-sm font-semibold text-accent group-hover:underline transition-all duration-150 font-sans"
                 >
                   Read more
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-150" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-150" weight="Filled" />
                 </Link>
               </div>
             </div>

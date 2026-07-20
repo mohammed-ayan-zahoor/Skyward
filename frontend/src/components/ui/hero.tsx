@@ -31,7 +31,7 @@ export function Hero() {
                   href="/work"
                   className="rounded-[4px] bg-accent hover:bg-amber-600 px-8 py-4 text-center font-semibold text-white flex items-center justify-center gap-2 shadow-sm font-sans"
                 >
-                  <Folder className="w-5 h-5" />
+                  <Folder className="w-5 h-5" weight="Filled" />
                   Explore Installations
                 </Link>
                 <Link
@@ -39,7 +39,7 @@ export function Hero() {
                   className="flex items-center justify-center rounded-[4px] border border-solid border-white/20 hover:border-white/40 bg-white/10 hover:bg-white/20 px-8 py-4 font-bold text-white gap-2 shadow-sm font-sans"
                 >
                   Contact Us
-                  <ArrowRight className="w-4 h-4 text-white/80" />
+                  <ArrowRight className="w-4 h-4 text-white/80" weight="Filled" />
                 </Link>
               </div>
             </div>
@@ -65,7 +65,7 @@ export function Hero() {
                   href="/work"
                   className="rounded-[4px] bg-accent hover:bg-amber-600 px-8 py-4 text-center font-semibold text-white transition-colors duration-150 flex items-center justify-center gap-2 shadow-sm font-sans"
                 >
-                  <Folder className="w-5 h-5" />
+                  <Folder className="w-5 h-5" weight="Filled" />
                   Explore Installations
                 </Link>
                 <Link
@@ -73,7 +73,7 @@ export function Hero() {
                   className="flex items-center justify-center rounded-[4px] border border-solid border-white/20 hover:border-white/40 bg-white/10 hover:bg-white/20 px-8 py-4 font-bold text-white transition-all duration-150 gap-2 shadow-sm font-sans"
                 >
                   Contact Us
-                  <ArrowRight className="w-4 h-4 text-white/80" />
+                  <ArrowRight className="w-4 h-4 text-white/80" weight="Filled" />
                 </Link>
               </motion.div>
             </div>

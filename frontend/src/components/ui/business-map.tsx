@@ -58,7 +58,7 @@ export default function BusinessMap({
             <MapMarker longitude={longitude} latitude={latitude}>
               <MarkerContent>
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white shadow-md border-2 border-white cursor-pointer hover:scale-110 transition-transform duration-150">
-                  <Location className="h-5 w-5" />
+                  <Location className="h-5 w-5" weight="Filled" />
                 </div>
               </MarkerContent>
               <MarkerPopup>
@@ -79,7 +79,7 @@ export default function BusinessMap({
         {/* Address */}
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-[4px] bg-primary/5 border border-primary/10 text-primary">
-            <Location className="w-5 h-5" />
+            <Location className="w-5 h-5" weight="Filled" />
           </div>
           <div>
             <h4 className="font-heading text-primary uppercase text-sm tracking-wider">Business Address</h4>
@@ -93,7 +93,7 @@ export default function BusinessMap({
         {/* Hours */}
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-[4px] bg-primary/5 border border-primary/10 text-primary">
-            <Clock className="w-5 h-5" />
+            <Clock className="w-5 h-5" weight="Filled" />
           </div>
           <div>
             <h4 className="font-heading text-primary uppercase text-sm tracking-wider">Operating Hours</h4>
@@ -107,7 +107,7 @@ export default function BusinessMap({
         {/* Contact info */}
         <div className="flex items-start gap-4">
           <div className="p-3 rounded-[4px] bg-primary/5 border border-primary/10 text-primary">
-            <Envelope className="w-5 h-5" />
+            <Envelope className="w-5 h-5" weight="Filled" />
           </div>
           <div>
             <h4 className="font-heading text-primary uppercase text-sm tracking-wider">Get in Touch</h4>

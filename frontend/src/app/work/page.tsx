@@ -138,15 +138,15 @@ export default function GalleryPage() {
                 {/* Tech Specs Monospace Badges */}
                 <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                   <div className="flex items-center gap-1">
-                    <Location className="w-3.5 h-3.5 text-slate-400" />
+                    <Location className="w-3.5 h-3.5 text-slate-400" weight="Filled" />
                     <span>{project.location}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Setting className="w-3.5 h-3.5 text-slate-400" />
+                    <Setting className="w-3.5 h-3.5 text-slate-400" weight="Filled" />
                     <span>{project.type}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" weight="Filled" />
                     <span>{project.year}</span>
                   </div>
                 </div>

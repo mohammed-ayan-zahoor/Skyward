@@ -32,7 +32,7 @@ export default function Home() {
               {/* Feature 1 */}
               <div className="flex flex-col items-start text-left gap-4">
                 <div className="p-3 rounded-lg bg-blue-50 border border-blue-100 text-blue-600">
-                  <Flash className="w-6 h-6" />
+                  <Flash className="w-6 h-6" weight="Filled" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Rapid Construction</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-sans">
@@ -43,7 +43,7 @@ export default function Home() {
               {/* Feature 2 */}
               <div className="flex flex-col items-start text-left gap-4">
                 <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600">
-                  <ShieldCheck className="w-6 h-6" />
+                  <ShieldCheck className="w-6 h-6" weight="Filled" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Wind & Seismic Rated</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-sans">
@@ -54,7 +54,7 @@ export default function Home() {
               {/* Feature 3 */}
               <div className="flex flex-col items-start text-left gap-4">
                 <div className="p-3 rounded-lg bg-amber-50 border border-amber-100 text-amber-600">
-                  <Activity className="w-6 h-6" />
+                  <Activity className="w-6 h-6" weight="Filled" />
                 </div>
                 <h3 className="text-lg font-bold text-slate-900">Integrated Utilities</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-sans">

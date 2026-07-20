@@ -11,7 +11,7 @@ export default function AboutPage() {
         {/* Header */}
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Star className="w-5 h-5 text-accent animate-spin-slow" />
+            <Star className="w-5 h-5 text-accent animate-spin-slow" weight="Filled" />
             <span className="text-xs font-bold tracking-[0.2em] text-slate-800 font-mono">WHO WE ARE</span>
           </div>
           <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ export default function AboutPage() {
               >
                 REQUEST CONSULTATION
                 <span className="w-8 h-8 rounded-[2px] bg-white text-neutral-950 flex items-center justify-center">
-                  <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+                  <ArrowRight className="w-4 h-4" weight="Filled" />
                 </span>
               </Link>
             </div>

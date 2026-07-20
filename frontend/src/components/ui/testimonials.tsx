@@ -79,7 +79,7 @@ export function Testimonials() {
                   </div>
                 </div>
                 {/* Clean quote vector representation */}
-                <QuoteUp className="w-5 h-5 text-accent/40 flex-none" />
+                <QuoteUp className="w-5 h-5 text-accent/40 flex-none" weight="Filled" />
               </div>
 
               {/* Large Card Image */}
@@ -102,6 +102,7 @@ export function Testimonials() {
                     <Star 
                       key={idx} 
                       className="w-3.5 h-3.5 fill-accent text-accent flex-none" 
+                      weight="Filled"
                     />
                   ))}
                 </div>
