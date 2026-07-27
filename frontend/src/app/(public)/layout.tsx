@@ -1,0 +1,27 @@
+import Link from "next/link";
+import AppMenuBar from "@/components/ui/app-menu-bar";
+import { Footer } from "@/components/ui/footer";
+import { PreloaderProvider } from "@/components/ui/preloader-provider";
+
+export default function PublicLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <PreloaderProvider>
+      <header className="w-full max-w-7xl mx-auto py-4 px-5 md:px-10 flex items-center justify-between sticky top-0 z-50">
+        <Link href="/" className="flex items-center">
+          <img 
+            src="/logo.png" 
+            alt="Skyward Logo" 
+            className="h-12 md:h-16 w-auto object-contain select-none" 
+          />
+        </Link>
+        <AppMenuBar />
+      </header>
+      <main className="flex-1 flex flex-col">{children}</main>
+      <Footer />
+    </PreloaderProvider>
+  );
+}
