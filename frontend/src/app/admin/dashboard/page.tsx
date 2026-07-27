@@ -11,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -127,6 +130,11 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [userEmail, setUserEmail] = useState("");
 
+  // Delete Confirmation Dialog States
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deletingWorkId, setDeletingWorkId] = useState<string | null>(null);
+  const [deletingWorkTitle, setDeletingWorkTitle] = useState<string | null>(null);
+
   // ── Auth check ────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`${API}/api/auth/me`, { credentials: "include" })
@@ -194,12 +202,21 @@ export default function AdminDashboard() {
     }
   }
 
-  async function deleteWork(id: string) {
-    if (!confirm("Delete this installation permanently?")) return;
-    await fetch(`${API}/api/admin/installations/${id}`, {
+  function triggerDelete(w: Installation) {
+    setDeletingWorkId(w.id);
+    setDeletingWorkTitle(w.title);
+    setDeleteConfirmOpen(true);
+  }
+
+  async function confirmDelete() {
+    if (!deletingWorkId) return;
+    await fetch(`${API}/api/admin/installations/${deletingWorkId}`, {
       method: "DELETE",
       credentials: "include",
     });
+    setDeleteConfirmOpen(false);
+    setDeletingWorkId(null);
+    setDeletingWorkTitle(null);
     await fetchWorks();
   }
 
@@ -383,7 +400,7 @@ export default function AdminDashboard() {
                               </DropdownMenuItem>
                               <DropdownMenuSeparator className="bg-slate-100" />
                               <DropdownMenuItem
-                                onClick={() => deleteWork(w.id)}
+                                onClick={() => triggerDelete(w)}
                                 className="uppercase tracking-wider text-red-650 focus:text-red-650 cursor-pointer py-1.5 focus:bg-red-50"
                               >
                                 Delete
@@ -628,6 +645,38 @@ export default function AdminDashboard() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* ── Delete Confirmation Dialog ── */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="bg-white border border-slate-200 shadow-2xl p-6 sm:max-w-md rounded-[2px] w-full max-w-[calc(100%-2rem)] flex flex-col gap-4">
+          <DialogHeader className="p-0 flex flex-col gap-1">
+            <DialogTitle className="font-mono text-[11px] uppercase tracking-widest text-red-650 font-bold">
+              Confirm Delete Action
+            </DialogTitle>
+            <DialogDescription className="font-mono text-[10px] uppercase tracking-widest text-slate-400 font-medium">
+              This action is permanent and cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 text-sm text-slate-750 font-sans leading-relaxed">
+            Are you sure you want to permanently delete the job record for <strong className="text-slate-900">{deletingWorkTitle}</strong>? This will cascade-delete all of its associated photos.
+          </div>
+          <div className="flex gap-3 justify-end mt-2 pt-4 border-t border-slate-100">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteConfirmOpen(false)}
+              className="rounded-[4px] font-mono text-[11px] uppercase tracking-widest border-slate-250 hover:bg-slate-50 cursor-pointer h-9 px-4 font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDelete}
+              className="rounded-[4px] font-mono text-[11px] uppercase tracking-widest bg-red-600 hover:bg-red-700 text-white h-9 px-4 font-bold cursor-pointer border-none"
+            >
+              Delete Job
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
