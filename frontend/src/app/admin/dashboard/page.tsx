@@ -648,7 +648,7 @@ export default function AdminDashboard() {
 
       {/* ── Delete Confirmation Dialog ── */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-        <DialogContent className="bg-white border border-slate-200 shadow-2xl p-6 sm:max-w-md rounded-[2px] w-full max-w-[calc(100%-2rem)] flex flex-col gap-4">
+        <DialogContent className="bg-white border border-slate-200 shadow-2xl p-6 sm:max-w-md w-full max-w-[calc(100%-2rem)] flex flex-col gap-4">
           <DialogHeader className="p-0 flex flex-col gap-1">
             <DialogTitle className="font-mono text-[11px] uppercase tracking-widest text-red-650 font-bold">
               Confirm Delete Action
@@ -664,13 +664,13 @@ export default function AdminDashboard() {
             <Button
               variant="outline"
               onClick={() => setDeleteConfirmOpen(false)}
-              className="rounded-[4px] font-mono text-[11px] uppercase tracking-widest border-slate-250 hover:bg-slate-50 cursor-pointer h-9 px-4 font-bold"
+              className="rounded-md font-mono text-[11px] uppercase tracking-widest border-slate-250 hover:bg-slate-50 cursor-pointer h-9 px-4 font-bold"
             >
               Cancel
             </Button>
             <Button
               onClick={confirmDelete}
-              className="rounded-[4px] font-mono text-[11px] uppercase tracking-widest bg-red-600 hover:bg-red-700 text-white h-9 px-4 font-bold cursor-pointer border-none"
+              className="rounded-md font-mono text-[11px] uppercase tracking-widest bg-red-600 hover:bg-red-700 text-white h-9 px-4 font-bold cursor-pointer border-none"
             >
               Delete Job
             </Button>
