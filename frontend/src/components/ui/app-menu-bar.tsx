@@ -22,38 +22,52 @@ import {
 export default function AppMenuBar() {
   return (
     <Menubar className="bg-white border border-slate-200 shadow-sm rounded-full px-3 py-1.5 text-slate-900 font-sans">
-      {/* Works Menu */}
+      {/* Services Menu */}
       <MenubarMenu>
         <MenubarTrigger className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 transition-colors duration-150 rounded-full">
           <Folder className="w-4 h-4 text-blue-600" weight="Filled" />
-          Installations
+          Services
         </MenubarTrigger>
-        <MenubarContent className="w-56 rounded-[2px]">
+        <MenubarContent className="w-64 rounded-[2px]">
+          {/* Section: Fabrications & Installations */}
+          <div className="px-2 py-1.5 text-xs font-mono font-bold text-slate-450 uppercase tracking-widest">
+            Fabrication & Installation
+          </div>
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
             <Link href="/work" className="flex items-center gap-2">
               <FileText className="w-4 h-4" weight="Filled" />
-              All Installations
+              All Work
+            </Link>
+          </MenubarItem>
+          <MenubarItem asChild className="rounded-[4px] cursor-pointer">
+            <Link href="/work?category=peb" className="flex items-center gap-2 pl-4">
+              <span className="text-[10px] font-bold text-accent font-mono w-4">01</span>
+              PEB
+            </Link>
+          </MenubarItem>
+          <MenubarItem asChild className="rounded-[4px] cursor-pointer">
+            <Link href="/work?category=warehouse" className="flex items-center gap-2 pl-4">
+              <span className="text-[10px] font-bold text-accent font-mono w-4">02</span>
+              Warehouse
+            </Link>
+          </MenubarItem>
+          <MenubarItem asChild className="rounded-[4px] cursor-pointer">
+            <Link href="/work?category=other" className="flex items-center gap-2 pl-4">
+              <span className="text-[10px] font-bold text-accent font-mono w-4">03</span>
+              Other Structural Work
             </Link>
           </MenubarItem>
           
           <MenubarSeparator />
-          
+
+          {/* Section: Products */}
+          <div className="px-2 py-1.5 text-xs font-mono font-bold text-slate-450 uppercase tracking-widest">
+            Products
+          </div>
           <MenubarItem asChild className="rounded-[4px] cursor-pointer">
-            <Link href="/work?type=cantilever" className="flex items-center gap-2">
-              <span className="w-4 text-center font-mono text-xs font-semibold text-slate-400">C</span>
-              Cantilever Canopies
-            </Link>
-          </MenubarItem>
-          <MenubarItem asChild className="rounded-[4px] cursor-pointer">
-            <Link href="/work?type=flat-roof" className="flex items-center gap-2">
-              <span className="w-4 text-center font-mono text-xs font-semibold text-slate-400">F</span>
-              Flat-Roof Canopies
-            </Link>
-          </MenubarItem>
-          <MenubarItem asChild className="rounded-[4px] cursor-pointer">
-            <Link href="/work?type=curved" className="flex items-center gap-2">
-              <span className="w-4 text-center font-mono text-xs font-semibold text-slate-400">R</span>
-              Curved Fascia Canopies
+            <Link href="/work?tab=products" className="flex items-center gap-2">
+              <Folder className="w-4 h-4" weight="Filled" />
+              Materials & Products
             </Link>
           </MenubarItem>
         </MenubarContent>
