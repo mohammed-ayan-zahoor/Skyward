@@ -7,6 +7,7 @@ require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const path_1 = __importDefault(require("path"));
 const installations_1 = __importDefault(require("./routes/installations"));
 const leads_1 = __importDefault(require("./routes/leads"));
 const auth_1 = __importDefault(require("./routes/auth"));
@@ -20,6 +21,7 @@ app.use((0, cors_1.default)({
 }));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
+app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
 // Routes
 app.use('/api/installations', installations_1.default);
 app.use('/api/leads', leads_1.default);

@@ -26,10 +26,18 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { Star, Trash } from "reicon-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+interface Photo {
+  id: string;
+  imageUrl: string;
+  caption?: string;
+  isCover: boolean;
+}
+
 interface Installation {
   id: string;
   title: string;
@@ -41,6 +49,8 @@ interface Installation {
   isFeatured: boolean;
   status: string;
   brand?: string;
+  photos?: Photo[];
+  coverImageId?: string | null;
 }
 
 interface Lead {
@@ -135,6 +145,9 @@ export default function AdminDashboard() {
   const [deletingWorkId, setDeletingWorkId] = useState<string | null>(null);
   const [deletingWorkTitle, setDeletingWorkTitle] = useState<string | null>(null);
 
+  // File Upload State
+  const [uploading, setUploading] = useState(false);
+
   // ── Auth check ────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`${API}/api/auth/me`, { credentials: "include" })
@@ -218,6 +231,85 @@ export default function AdminDashboard() {
     setDeletingWorkId(null);
     setDeletingWorkTitle(null);
     await fetchWorks();
+  }
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !editing.id) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    try {
+      const res = await fetch(`${API}/api/admin/installations/${editing.id}/upload`, {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const newPhoto = await res.json();
+        const updatedPhotos = editing.photos ? [...editing.photos, newPhoto] : [newPhoto];
+        setEditing({
+          ...editing,
+          photos: updatedPhotos,
+          coverImageId: newPhoto.isCover ? newPhoto.id : editing.coverImageId,
+        });
+        await fetchWorks();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to upload photo");
+      }
+    } catch {
+      alert("Upload failed. Check backend connection.");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  async function deletePhoto(photoId: string) {
+    if (!confirm("Remove this image permanently?")) return;
+    try {
+      const res = await fetch(`${API}/api/admin/photos/${photoId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (res.ok) {
+        const updatedPhotos = editing.photos?.filter((p) => p.id !== photoId) || [];
+        setEditing({
+          ...editing,
+          photos: updatedPhotos,
+          coverImageId: editing.coverImageId === photoId ? (updatedPhotos[0]?.id || null) : editing.coverImageId,
+        });
+        await fetchWorks();
+      }
+    } catch {
+      alert("Failed to delete photo");
+    }
+  }
+
+  async function setCoverPhoto(photoId: string) {
+    try {
+      const res = await fetch(`${API}/api/admin/installations/${editing.id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coverImageId: photoId }),
+      });
+
+      if (res.ok) {
+        setEditing({
+          ...editing,
+          coverImageId: photoId,
+        });
+        await fetchWorks();
+      }
+    } catch {
+      alert("Failed to set cover photo");
+    }
   }
 
   async function toggleFeatured(w: Installation) {
@@ -625,6 +717,93 @@ export default function AdminDashboard() {
                 Feature on homepage
               </Label>
             </div>
+
+            {/* ── Photo Management Section (Edit Mode Only) ── */}
+            {!isNew && editing.id && (
+              <>
+                <Separator className="my-2 bg-slate-100" />
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-mono text-[10px] uppercase tracking-widest text-[#E8891C] font-bold">
+                      Site Photo Registry
+                    </h3>
+                    <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 mt-0.5">
+                      Upload site images to disk. First photo becomes cover.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold block">
+                      Add site Photo
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={handlePhotoUpload}
+                        disabled={uploading}
+                        className="rounded-[4px] font-mono text-xs cursor-pointer border-dashed border-slate-300 py-1 file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-[#1C2B36] file:text-white hover:border-[#E8891C] transition-colors h-11"
+                      />
+                    </div>
+                    {uploading && (
+                      <p className="font-mono text-[9px] text-[#E8891C] animate-pulse uppercase tracking-wider font-semibold">
+                        Uploading file payload...
+                      </p>
+                    )}
+                  </div>
+
+                  {editing.photos && editing.photos.length > 0 ? (
+                    <div className="grid grid-cols-3 gap-3">
+                      {editing.photos.map((p) => {
+                        const isCover = editing.coverImageId === p.id;
+                        return (
+                          <div key={p.id} className="relative group aspect-video border border-slate-200 rounded-[2px] overflow-hidden bg-slate-50">
+                            <img
+                              src={`${API}${p.imageUrl}`}
+                              alt={editing.title}
+                              className="w-full h-full object-cover"
+                            />
+                            
+                            {/* Overlay Controls */}
+                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setCoverPhoto(p.id)}
+                                className={`p-1.5 rounded-[2px] bg-white transition-colors cursor-pointer border-none ${
+                                  isCover ? "text-amber-500" : "text-slate-450 hover:text-amber-500"
+                                }`}
+                                title={isCover ? "Cover Image" : "Make Cover"}
+                              >
+                                <Star className="w-3.5 h-3.5" weight={isCover ? "Filled" : "Outline"} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deletePhoto(p.id)}
+                                className="p-1.5 rounded-[2px] bg-white text-red-650 hover:text-red-750 transition-colors cursor-pointer border-none"
+                                title="Remove Photo"
+                              >
+                                <Trash className="w-3.5 h-3.5" weight="Filled" />
+                              </button>
+                            </div>
+                            
+                            {/* Cover Badge indicator */}
+                            {isCover && (
+                              <div className="absolute top-1 left-1 bg-amber-500 text-white font-mono text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-[2px]">
+                                COVER
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 py-4 text-center border border-dashed border-slate-200">
+                      No site images registered.
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex gap-3 pt-6 border-t border-slate-100 mt-auto">

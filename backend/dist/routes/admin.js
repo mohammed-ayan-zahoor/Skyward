@@ -6,7 +6,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_1 = require("../middleware/auth");
 const db_1 = __importDefault(require("../db"));
+const multer_1 = __importDefault(require("multer"));
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
 const router = (0, express_1.Router)();
+// Configure storage destination dynamically based on installationId
+const storage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        const id = req.params.id; // installationId passed in URL parameter
+        const uploadDir = path_1.default.join(__dirname, '../../uploads/installations', id);
+        // Ensure upload directory exists on disk
+        fs_1.default.mkdirSync(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        // Generate clean filename using timestamp and extension
+        const ext = path_1.default.extname(file.originalname);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, `photo-${uniqueSuffix}${ext}`);
+    }
+});
+const upload = (0, multer_1.default)({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|webp/;
+        ;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path_1.default.extname(file.originalname).toLowerCase());
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Only JPEG, JPG, PNG, and WebP images are allowed.'));
+    }
+});
 // Protect all routes in this router with admin authentication
 router.use(auth_1.requireAdmin);
 /**
@@ -122,6 +155,53 @@ router.delete('/installations/:id', async (req, res) => {
         console.error(err);
         res.status(500).json({ error: 'Failed to delete installation' });
     }
+});
+// POST /api/admin/installations/:id/upload
+// Upload an image file for an installation, save it on disk, and create db photo reference
+router.post('/installations/:id/upload', (req, res) => {
+    const id = req.params.id;
+    upload.single('photo')(req, res, async (err) => {
+        if (err) {
+            res.status(400).json({ error: err.message || 'File upload failed' });
+            return;
+        }
+        if (!req.file) {
+            res.status(400).json({ error: 'No file uploaded' });
+            return;
+        }
+        try {
+            const inst = await db_1.default.installation.findUnique({ where: { id } });
+            if (!inst) {
+                res.status(404).json({ error: 'Installation not found' });
+                return;
+            }
+            // Generate the public web path
+            const imageUrl = `/uploads/installations/${id}/${req.file.filename}`;
+            // Check if this is the first photo of the installation (so we make it the cover by default)
+            const photoCount = await db_1.default.photo.count({ where: { installationId: id } });
+            const isCover = photoCount === 0;
+            const photo = await db_1.default.photo.create({
+                data: {
+                    installationId: id,
+                    imageUrl,
+                    isCover,
+                    sortOrder: photoCount,
+                }
+            });
+            // Update coverImageId on installation if this is the cover photo
+            if (isCover) {
+                await db_1.default.installation.update({
+                    where: { id },
+                    data: { coverImageId: photo.id }
+                });
+            }
+            res.status(201).json(photo);
+        }
+        catch (dbErr) {
+            console.error(dbErr);
+            res.status(500).json({ error: 'Failed to save photo metadata in database' });
+        }
+    });
 });
 /**
  * ==========================================
