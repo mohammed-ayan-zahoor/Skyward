@@ -335,4 +335,22 @@ router.patch('/leads/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to update inquiry status' });
     }
 });
+// DELETE /api/admin/leads/:id
+// Delete an inquiry lead permanently
+router.delete('/leads/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const existing = await db_1.default.lead.findUnique({ where: { id } });
+        if (!existing) {
+            res.status(404).json({ error: 'Inquiry not found' });
+            return;
+        }
+        await db_1.default.lead.delete({ where: { id } });
+        res.json({ message: 'Inquiry deleted successfully' });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete inquiry' });
+    }
+});
 exports.default = router;

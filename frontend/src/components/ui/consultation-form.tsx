@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+
 export function ConsultationForm() {
   const [formData, setFormData] = useState({
     firstName: "",
@@ -12,21 +14,47 @@ export function ConsultationForm() {
     phone: "",
     requirements: "",
   });
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In the future, this will connect to the Prisma /api/leads route
-    console.log("Submitting B2B Lead Consultation:", formData);
-    alert("Thank you! Your project consultation request has been submitted.");
-    setFormData({
-      firstName: "",
-      lastName: "",
-      companyName: "",
-      projectLocation: "",
-      email: "",
-      phone: "",
-      requirements: "",
-    });
+    setSubmitting(true);
+
+    const name = `${formData.firstName} ${formData.lastName} (${formData.companyName})`.trim();
+    const message = `Location: ${formData.projectLocation}\nRequirements: ${formData.requirements}`.trim();
+
+    try {
+      const res = await fetch(`${API}/api/leads`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email: formData.email,
+          phone: formData.phone,
+          message,
+        }),
+      });
+
+      if (res.ok) {
+        alert("Thank you! Your project consultation request has been submitted successfully.");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          companyName: "",
+          projectLocation: "",
+          email: "",
+          phone: "",
+          requirements: "",
+        });
+      } else {
+        const data = await res.json();
+        alert(data.error || "Failed to submit request.");
+      }
+    } catch {
+      alert("Unable to submit request. Check your network or server status.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -163,9 +191,10 @@ export function ConsultationForm() {
               </button>
               <button 
                 type="submit" 
-                className="w-full sm:w-auto sm:px-16 py-3 border border-transparent rounded-[4px] font-semibold text-white bg-accent hover:bg-amber-600 transition-all duration-150 font-sans cursor-pointer shadow-sm"
+                disabled={submitting}
+                className="w-full sm:w-auto sm:px-16 py-3 border border-transparent rounded-[4px] font-semibold text-white bg-accent hover:bg-amber-600 transition-all duration-150 font-sans cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Request
+                {submitting ? "Submitting..." : "Submit Request"}
               </button>
             </div>
           </form>

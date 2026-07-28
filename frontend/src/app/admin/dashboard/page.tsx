@@ -148,6 +148,11 @@ export default function AdminDashboard() {
   // File Upload State
   const [uploading, setUploading] = useState(false);
 
+  // Lead Delete Confirmation States
+  const [deleteLeadConfirmOpen, setDeleteLeadConfirmOpen] = useState(false);
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
+  const [deletingLeadName, setDeletingLeadName] = useState<string | null>(null);
+
   // ── Auth check ────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`${API}/api/auth/me`, { credentials: "include" })
@@ -320,6 +325,30 @@ export default function AdminDashboard() {
       body: JSON.stringify({ isFeatured: !w.isFeatured }),
     });
     await fetchWorks();
+  }
+
+  function triggerDeleteLead(l: Lead) {
+    setDeletingLeadId(l.id);
+    setDeletingLeadName(l.name);
+    setDeleteLeadConfirmOpen(true);
+  }
+
+  async function confirmDeleteLead() {
+    if (!deletingLeadId) return;
+    try {
+      const res = await fetch(`${API}/api/admin/leads/${deletingLeadId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        setDeleteLeadConfirmOpen(false);
+        setDeletingLeadId(null);
+        setDeletingLeadName(null);
+        await fetchLeads();
+      }
+    } catch {
+      alert("Failed to delete inquiry");
+    }
   }
 
   // ── Leads ─────────────────────────────────────────────────────────────────
@@ -530,13 +559,14 @@ export default function AdminDashboard() {
                     <TableHead className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold pl-6 py-4 w-44">Received Date</TableHead>
                     <TableHead className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold py-4 w-60">Client Contact</TableHead>
                     <TableHead className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold py-4">Inquiry details Message</TableHead>
-                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold w-44 pr-6 py-4">Status</TableHead>
+                    <TableHead className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold w-40 py-4">Status</TableHead>
+                    <TableHead className="w-16 pr-6"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {leads.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={4} className="text-center py-20 font-mono text-sm text-slate-400 uppercase tracking-widest">
+                      <TableCell colSpan={5} className="text-center py-20 font-mono text-sm text-slate-400 uppercase tracking-widest">
                         No inquiries in docket yet.
                       </TableCell>
                     </TableRow>
@@ -565,7 +595,7 @@ export default function AdminDashboard() {
                       <TableCell className="py-5 align-top max-w-sm">
                         <p className="text-sm text-slate-650 leading-relaxed font-sans pr-4">{l.message}</p>
                       </TableCell>
-                      <TableCell className="py-5 align-top pr-6">
+                      <TableCell className="py-5 align-top">
                         <Select
                           value={l.status}
                           onValueChange={(v) => { if (v) updateLeadStatus(l.id, v); }}
@@ -580,6 +610,15 @@ export default function AdminDashboard() {
                           </SelectContent>
                         </Select>
                         <div className="mt-2">{leadStatusBadge(l.status)}</div>
+                      </TableCell>
+                      <TableCell className="py-5 align-top pr-6 text-right">
+                        <button
+                          onClick={() => triggerDeleteLead(l)}
+                          className="p-1.5 rounded-[4px] hover:bg-red-50 text-red-650 hover:text-red-750 transition-colors cursor-pointer border-none bg-transparent inline-flex items-center justify-center"
+                          title="Delete Inquiry"
+                        >
+                          <Trash className="w-4 h-4 text-slate-400 hover:text-red-600" weight="Filled" />
+                        </button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -852,6 +891,38 @@ export default function AdminDashboard() {
               className="rounded-md font-mono text-[11px] uppercase tracking-widest bg-red-600 hover:bg-red-700 text-white h-9 px-4 font-bold cursor-pointer border-none"
             >
               Delete Job
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Delete Lead Confirmation Dialog ── */}
+      <Dialog open={deleteLeadConfirmOpen} onOpenChange={setDeleteLeadConfirmOpen}>
+        <DialogContent className="bg-white border border-slate-200 shadow-2xl p-6 sm:max-w-md w-full max-w-[calc(100%-2rem)] flex flex-col gap-4">
+          <DialogHeader className="p-0 flex flex-col gap-1">
+            <DialogTitle className="font-mono text-[11px] uppercase tracking-widest text-red-650 font-bold">
+              Confirm Delete Inquiry
+            </DialogTitle>
+            <DialogDescription className="font-mono text-[10px] uppercase tracking-widest text-slate-400 font-medium">
+              This action is permanent and cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 text-sm text-slate-750 font-sans leading-relaxed">
+            Are you sure you want to permanently delete the quote inquiry from <strong className="text-slate-900">{deletingLeadName}</strong>?
+          </div>
+          <div className="flex gap-3 justify-end mt-2 pt-4 border-t border-slate-100">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteLeadConfirmOpen(false)}
+              className="rounded-md font-mono text-[11px] uppercase tracking-widest border-slate-250 hover:bg-slate-50 cursor-pointer h-9 px-4 font-bold"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={confirmDeleteLead}
+              className="rounded-md font-mono text-[11px] uppercase tracking-widest bg-red-600 hover:bg-red-700 text-white h-9 px-4 font-bold cursor-pointer border-none"
+            >
+              Delete Inquiry
             </Button>
           </div>
         </DialogContent>

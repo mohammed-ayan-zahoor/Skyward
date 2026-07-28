@@ -161,7 +161,7 @@ function GalleryContent() {
             href="/work"
             className={`px-4 py-2 text-xs font-mono font-bold uppercase rounded-[2px] transition-colors ${
               activeTab === "works" 
-                ? "bg-primary text-white" 
+                ? "bg-primary !text-white" 
                 : "text-slate-650 hover:text-slate-900"
             }`}
           >
@@ -171,7 +171,7 @@ function GalleryContent() {
             href="/work?tab=products"
             className={`px-4 py-2 text-xs font-mono font-bold uppercase rounded-[2px] transition-colors ${
               activeTab === "products" 
-                ? "bg-primary text-white" 
+                ? "bg-primary !text-white" 
                 : "text-slate-650 hover:text-slate-900"
             }`}
           >
