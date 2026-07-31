@@ -16,7 +16,7 @@ async function seed() {
   console.log('Cleared existing MongoDB records.');
 
   // 2. Create default Admin User
-  const passwordHash = await bcrypt.hash('admin123', 10);
+  const passwordHash = await bcrypt.hash('Sky@563119', 10);
   const admin = await User.create({
     email: 'admin@skywardcanopies.com',
     passwordHash,
