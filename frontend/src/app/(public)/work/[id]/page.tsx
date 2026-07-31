@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Location, Setting, Calendar, Star } from "reicon-react";
 
@@ -34,6 +35,21 @@ const CATEGORY_LABELS: Record<string, string> = {
   warehouse: "Warehouse",
   other: "Other Structural Work",
 };
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const res = await fetch(`${API}/api/installations/${id}`, { cache: "no-store" });
+    if (res.ok) {
+      const project: Installation = await res.json();
+      return {
+        title: `${project.title} — Skyward Canopies`,
+        description: project.description || "Structural canopy installation by Skyward.",
+      };
+    }
+  } catch {}
+  return { title: "Installation — Skyward Canopies" };
+}
 
 // Server Component fetching the project details by slug (id parameter)
 export default async function ProjectDetailPage({ params }: PageProps) {

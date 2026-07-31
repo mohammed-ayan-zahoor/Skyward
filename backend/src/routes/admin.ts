@@ -71,7 +71,7 @@ router.get('/installations', async (req: AuthRequest, res: Response) => {
 // POST /api/admin/installations
 // Create a new installation (starts as draft by default)
 router.post('/installations', async (req: AuthRequest, res: Response) => {
-  const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status } = req.body;
+  const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, brand } = req.body;
 
   if (!title || !slug || !location || !canopyType || !yearCompleted || !description) {
     res.status(400).json({ error: 'Missing required installation fields' });
@@ -95,6 +95,7 @@ router.post('/installations', async (req: AuthRequest, res: Response) => {
         description,
         isFeatured: Boolean(isFeatured),
         status: status || 'draft',
+        brand: brand || null,
       },
     });
 
@@ -109,7 +110,7 @@ router.post('/installations', async (req: AuthRequest, res: Response) => {
 // Update installation details
 router.put('/installations/:id', async (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
-  const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, coverImageId } = req.body;
+  const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, coverImageId, brand } = req.body;
 
   try {
     const existing = await prisma.installation.findUnique({ where: { id } });
@@ -138,6 +139,7 @@ router.put('/installations/:id', async (req: AuthRequest, res: Response) => {
         ...(isFeatured !== undefined && { isFeatured: Boolean(isFeatured) }),
         ...(status && { status }),
         ...(coverImageId !== undefined && { coverImageId }),
+        ...(brand !== undefined && { brand }),
       },
     });
 

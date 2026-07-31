@@ -69,7 +69,7 @@ router.get('/installations', async (req, res) => {
 // POST /api/admin/installations
 // Create a new installation (starts as draft by default)
 router.post('/installations', async (req, res) => {
-    const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status } = req.body;
+    const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, brand } = req.body;
     if (!title || !slug || !location || !canopyType || !yearCompleted || !description) {
         res.status(400).json({ error: 'Missing required installation fields' });
         return;
@@ -90,6 +90,7 @@ router.post('/installations', async (req, res) => {
                 description,
                 isFeatured: Boolean(isFeatured),
                 status: status || 'draft',
+                brand: brand || null,
             },
         });
         res.status(201).json(installation);
@@ -103,7 +104,7 @@ router.post('/installations', async (req, res) => {
 // Update installation details
 router.put('/installations/:id', async (req, res) => {
     const id = req.params.id;
-    const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, coverImageId } = req.body;
+    const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, coverImageId, brand } = req.body;
     try {
         const existing = await db_1.default.installation.findUnique({ where: { id } });
         if (!existing) {
@@ -129,6 +130,7 @@ router.put('/installations/:id', async (req, res) => {
                 ...(isFeatured !== undefined && { isFeatured: Boolean(isFeatured) }),
                 ...(status && { status }),
                 ...(coverImageId !== undefined && { coverImageId }),
+                ...(brand !== undefined && { brand }),
             },
         });
         res.json(updated);

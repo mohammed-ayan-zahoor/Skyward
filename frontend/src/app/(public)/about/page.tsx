@@ -1,8 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Star } from "reicon-react";
 
-export default function AboutPage() {
-  const heroImage = "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=1200&h=500&q=80";
+const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+
+export const metadata: Metadata = {
+  title: "About Skyward — B2B Structural Canopy Fabricator",
+  description: "Skyward has been engineering wind-rated structural steel canopies for petrol stations and oil majors across India for over 15 years.",
+};
+
+export default async function AboutPage() {
+  let heroImage = "https://images.unsplash.com/photo-1590069261209-f8e9b8642343?auto=format&fit=crop&w=1200&h=500&q=80";
+
+  try {
+    const res = await fetch(`${API}/api/installations?featured=true`, { cache: "no-store" });
+    if (res.ok) {
+      const data = await res.json();
+      const coverPhoto = data[0]?.photos?.[0]?.imageUrl;
+      if (coverPhoto) {
+        heroImage = coverPhoto.startsWith("http") ? coverPhoto : `${API}${coverPhoto}`;
+      }
+    }
+  } catch {}
 
   return (
     <main className="min-h-screen bg-bg-warm font-sans flex items-center justify-center p-4 md:p-10 select-none">

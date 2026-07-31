@@ -25,7 +25,9 @@ router.get('/', async (req, res) => {
                 location: true,
                 canopyType: true,
                 yearCompleted: true,
+                description: true,
                 isFeatured: true,
+                brand: true,
                 coverImageId: true,
                 // Attach only the cover photo so the gallery grid doesn't load every image
                 photos: {

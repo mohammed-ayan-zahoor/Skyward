@@ -28,6 +28,7 @@ model Installation {
   yearCompleted Int      @map("year_completed")
   description   String
   coverImageId  String?  @map("cover_image_id")
+  brand         String?
   isFeatured    Boolean  @default(false) @map("is_featured")
   status        String   @default("draft")
   createdAt     DateTime @default(now()) @map("created_at")
