@@ -5,7 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const auth_1 = require("../middleware/auth");
-const db_1 = __importDefault(require("../db"));
+const Installation_1 = require("../models/Installation");
+const Lead_1 = require("../models/Lead");
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -13,32 +14,29 @@ const router = (0, express_1.Router)();
 // Configure storage destination dynamically based on installationId
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        const id = req.params.id; // installationId passed in URL parameter
+        const id = req.params.id;
         const uploadDir = path_1.default.join(__dirname, '../../uploads/installations', id);
-        // Ensure upload directory exists on disk
         fs_1.default.mkdirSync(uploadDir, { recursive: true });
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Generate clean filename using timestamp and extension
         const ext = path_1.default.extname(file.originalname);
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, `photo-${uniqueSuffix}${ext}`);
-    }
+    },
 });
 const upload = (0, multer_1.default)({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|webp/;
-        ;
         const mimetype = filetypes.test(file.mimetype);
         const extname = filetypes.test(path_1.default.extname(file.originalname).toLowerCase());
         if (mimetype && extname) {
             return cb(null, true);
         }
         cb(new Error('Only JPEG, JPG, PNG, and WebP images are allowed.'));
-    }
+    },
 });
 // Protect all routes in this router with admin authentication
 router.use(auth_1.requireAdmin);
@@ -51,14 +49,18 @@ router.use(auth_1.requireAdmin);
 // List ALL installations (both published and drafts)
 router.get('/installations', async (req, res) => {
     try {
-        const installations = await db_1.default.installation.findMany({
-            include: {
-                photos: {
-                    orderBy: { sortOrder: 'asc' },
-                },
-            },
-            orderBy: { createdAt: 'desc' },
-        });
+        const rawInstallations = await Installation_1.Installation.find().sort({ createdAt: -1 }).lean();
+        const installations = rawInstallations.map((inst) => ({
+            ...inst,
+            id: inst._id.toString(),
+            photos: (inst.photos || []).map((p) => ({
+                id: p._id.toString(),
+                imageUrl: p.imageUrl,
+                caption: p.caption,
+                sortOrder: p.sortOrder,
+                isCover: p.isCover,
+            })),
+        }));
         res.json(installations);
     }
     catch (err) {
@@ -75,23 +77,23 @@ router.post('/installations', async (req, res) => {
         return;
     }
     try {
-        const existing = await db_1.default.installation.findUnique({ where: { slug } });
+        const cleanSlug = slug.toLowerCase().trim();
+        const existing = await Installation_1.Installation.findOne({ slug: cleanSlug });
         if (existing) {
             res.status(400).json({ error: 'An installation with this slug already exists' });
             return;
         }
-        const installation = await db_1.default.installation.create({
-            data: {
-                title,
-                slug: slug.toLowerCase().trim(),
-                location,
-                canopyType,
-                yearCompleted: Number(yearCompleted),
-                description,
-                isFeatured: Boolean(isFeatured),
-                status: status || 'draft',
-                brand: brand || null,
-            },
+        const installation = await Installation_1.Installation.create({
+            title,
+            slug: cleanSlug,
+            location,
+            canopyType,
+            yearCompleted: Number(yearCompleted),
+            description,
+            isFeatured: Boolean(isFeatured),
+            status: status || 'draft',
+            brand: brand || null,
+            photos: [],
         });
         res.status(201).json(installation);
     }
@@ -106,34 +108,42 @@ router.put('/installations/:id', async (req, res) => {
     const id = req.params.id;
     const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, coverImageId, brand } = req.body;
     try {
-        const existing = await db_1.default.installation.findUnique({ where: { id } });
-        if (!existing) {
+        const inst = await Installation_1.Installation.findById(id);
+        if (!inst) {
             res.status(404).json({ error: 'Installation not found' });
             return;
         }
-        if (slug && slug !== existing.slug) {
-            const slugConflict = await db_1.default.installation.findUnique({ where: { slug } });
-            if (slugConflict) {
-                res.status(400).json({ error: 'An installation with this slug already exists' });
-                return;
+        if (slug) {
+            const cleanSlug = slug.toLowerCase().trim();
+            if (cleanSlug !== inst.slug) {
+                const slugConflict = await Installation_1.Installation.findOne({ slug: cleanSlug });
+                if (slugConflict) {
+                    res.status(400).json({ error: 'An installation with this slug already exists' });
+                    return;
+                }
+                inst.slug = cleanSlug;
             }
         }
-        const updated = await db_1.default.installation.update({
-            where: { id },
-            data: {
-                ...(title && { title }),
-                ...(slug && { slug: slug.toLowerCase().trim() }),
-                ...(location && { location }),
-                ...(canopyType && { canopyType }),
-                ...(yearCompleted && { yearCompleted: Number(yearCompleted) }),
-                ...(description && { description }),
-                ...(isFeatured !== undefined && { isFeatured: Boolean(isFeatured) }),
-                ...(status && { status }),
-                ...(coverImageId !== undefined && { coverImageId }),
-                ...(brand !== undefined && { brand }),
-            },
-        });
-        res.json(updated);
+        if (title !== undefined)
+            inst.title = title;
+        if (location !== undefined)
+            inst.location = location;
+        if (canopyType !== undefined)
+            inst.canopyType = canopyType;
+        if (yearCompleted !== undefined)
+            inst.yearCompleted = Number(yearCompleted);
+        if (description !== undefined)
+            inst.description = description;
+        if (isFeatured !== undefined)
+            inst.isFeatured = Boolean(isFeatured);
+        if (status !== undefined)
+            inst.status = status;
+        if (coverImageId !== undefined)
+            inst.coverImageId = coverImageId;
+        if (brand !== undefined)
+            inst.brand = brand;
+        await inst.save();
+        res.json(inst);
     }
     catch (err) {
         console.error(err);
@@ -141,16 +151,16 @@ router.put('/installations/:id', async (req, res) => {
     }
 });
 // DELETE /api/admin/installations/:id
-// Deletes installation (cascade deletes all related photos in db)
+// Deletes installation
 router.delete('/installations/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        const existing = await db_1.default.installation.findUnique({ where: { id } });
+        const existing = await Installation_1.Installation.findById(id);
         if (!existing) {
             res.status(404).json({ error: 'Installation not found' });
             return;
         }
-        await db_1.default.installation.delete({ where: { id } });
+        await Installation_1.Installation.findByIdAndDelete(id);
         res.json({ message: 'Installation deleted successfully' });
     }
     catch (err) {
@@ -159,7 +169,7 @@ router.delete('/installations/:id', async (req, res) => {
     }
 });
 // POST /api/admin/installations/:id/upload
-// Upload an image file for an installation, save it on disk, and create db photo reference
+// Upload an image file for an installation, save it on disk, and add photo reference
 router.post('/installations/:id/upload', (req, res) => {
     const id = req.params.id;
     upload.single('photo')(req, res, async (err) => {
@@ -172,32 +182,30 @@ router.post('/installations/:id/upload', (req, res) => {
             return;
         }
         try {
-            const inst = await db_1.default.installation.findUnique({ where: { id } });
+            const inst = await Installation_1.Installation.findById(id);
             if (!inst) {
                 res.status(404).json({ error: 'Installation not found' });
                 return;
             }
-            // Generate the public web path
             const imageUrl = `/uploads/installations/${id}/${req.file.filename}`;
-            // Check if this is the first photo of the installation (so we make it the cover by default)
-            const photoCount = await db_1.default.photo.count({ where: { installationId: id } });
-            const isCover = photoCount === 0;
-            const photo = await db_1.default.photo.create({
-                data: {
-                    installationId: id,
-                    imageUrl,
-                    isCover,
-                    sortOrder: photoCount,
-                }
-            });
-            // Update coverImageId on installation if this is the cover photo
+            const isCover = inst.photos.length === 0;
+            const newPhoto = {
+                imageUrl,
+                isCover,
+                sortOrder: inst.photos.length,
+            };
+            inst.photos.push(newPhoto);
+            const addedPhoto = inst.photos[inst.photos.length - 1];
             if (isCover) {
-                await db_1.default.installation.update({
-                    where: { id },
-                    data: { coverImageId: photo.id }
-                });
+                inst.coverImageId = addedPhoto._id.toString();
             }
-            res.status(201).json(photo);
+            await inst.save();
+            res.status(201).json({
+                id: addedPhoto._id.toString(),
+                imageUrl: addedPhoto.imageUrl,
+                isCover: addedPhoto.isCover,
+                sortOrder: addedPhoto.sortOrder,
+            });
         }
         catch (dbErr) {
             console.error(dbErr);
@@ -211,44 +219,42 @@ router.post('/installations/:id/upload', (req, res) => {
  * ==========================================
  */
 // POST /api/admin/installations/:id/photos
-// Add a photo reference to an installation
 router.post('/installations/:id/photos', async (req, res) => {
-    const id = req.params.id; // installationId
+    const id = req.params.id;
     const { imageUrl, caption, sortOrder, isCover } = req.body;
     if (!imageUrl) {
         res.status(400).json({ error: 'Image URL is required' });
         return;
     }
     try {
-        const inst = await db_1.default.installation.findUnique({ where: { id } });
+        const inst = await Installation_1.Installation.findById(id);
         if (!inst) {
             res.status(404).json({ error: 'Installation not found' });
             return;
         }
-        // If isCover is true, set all other photos of this installation to false
         if (isCover) {
-            await db_1.default.photo.updateMany({
-                where: { installationId: id },
-                data: { isCover: false },
-            });
+            inst.photos.forEach((p) => { p.isCover = false; });
         }
-        const photo = await db_1.default.photo.create({
-            data: {
-                installationId: id,
-                imageUrl,
-                caption,
-                sortOrder: Number(sortOrder || 0),
-                isCover: Boolean(isCover),
-            },
-        });
-        // If this is the first photo or marked as cover, auto-update installation coverImageId
+        const newPhoto = {
+            imageUrl,
+            caption,
+            sortOrder: Number(sortOrder || 0),
+            isCover: Boolean(isCover),
+        };
+        inst.photos.push(newPhoto);
+        const addedPhoto = inst.photos[inst.photos.length - 1];
+        const photoId = addedPhoto._id.toString();
         if (isCover || !inst.coverImageId) {
-            await db_1.default.installation.update({
-                where: { id },
-                data: { coverImageId: photo.id },
-            });
+            inst.coverImageId = photoId;
         }
-        res.status(201).json(photo);
+        await inst.save();
+        res.status(201).json({
+            id: photoId,
+            imageUrl: addedPhoto.imageUrl,
+            caption: addedPhoto.caption,
+            sortOrder: addedPhoto.sortOrder,
+            isCover: addedPhoto.isCover,
+        });
     }
     catch (err) {
         console.error(err);
@@ -256,40 +262,25 @@ router.post('/installations/:id/photos', async (req, res) => {
     }
 });
 // DELETE /api/admin/photos/:id
-// Remove a photo from an installation
 router.delete('/photos/:id', async (req, res) => {
-    const id = req.params.id;
+    const photoId = req.params.id;
     try {
-        const photo = await db_1.default.photo.findUnique({ where: { id } });
-        if (!photo) {
+        const inst = await Installation_1.Installation.findOne({ 'photos._id': photoId });
+        if (!inst) {
             res.status(404).json({ error: 'Photo not found' });
             return;
         }
-        await db_1.default.photo.delete({ where: { id } });
-        // If we deleted the cover photo, unset coverImageId on installation or pick the next one
-        const inst = await db_1.default.installation.findUnique({
-            where: { id: photo.installationId },
-            include: { photos: true },
-        });
-        if (inst && inst.coverImageId === id) {
-            const nextCover = inst.photos[0]; // pick first available
-            if (nextCover) {
-                await db_1.default.photo.update({
-                    where: { id: nextCover.id },
-                    data: { isCover: true },
-                });
-                await db_1.default.installation.update({
-                    where: { id: inst.id },
-                    data: { coverImageId: nextCover.id },
-                });
+        inst.photos = inst.photos.filter((p) => p._id.toString() !== photoId);
+        if (inst.coverImageId === photoId) {
+            if (inst.photos.length > 0) {
+                inst.photos[0].isCover = true;
+                inst.coverImageId = inst.photos[0]._id.toString();
             }
             else {
-                await db_1.default.installation.update({
-                    where: { id: inst.id },
-                    data: { coverImageId: null },
-                });
+                inst.coverImageId = undefined;
             }
         }
+        await inst.save();
         res.json({ message: 'Photo deleted successfully' });
     }
     catch (err) {
@@ -303,12 +294,13 @@ router.delete('/photos/:id', async (req, res) => {
  * ==========================================
  */
 // GET /api/admin/leads
-// List all leads/inquiries
 router.get('/leads', async (req, res) => {
     try {
-        const leads = await db_1.default.lead.findMany({
-            orderBy: { submittedAt: 'desc' },
-        });
+        const rawLeads = await Lead_1.Lead.find().sort({ submittedAt: -1 }).lean();
+        const leads = rawLeads.map((l) => ({
+            ...l,
+            id: l._id.toString(),
+        }));
         res.json(leads);
     }
     catch (err) {
@@ -317,7 +309,6 @@ router.get('/leads', async (req, res) => {
     }
 });
 // PATCH /api/admin/leads/:id
-// Update status of an inquiry (e.g. mark as contacted, closed)
 router.patch('/leads/:id', async (req, res) => {
     const id = req.params.id;
     const { status } = req.body;
@@ -326,10 +317,11 @@ router.patch('/leads/:id', async (req, res) => {
         return;
     }
     try {
-        const updated = await db_1.default.lead.update({
-            where: { id },
-            data: { status },
-        });
+        const updated = await Lead_1.Lead.findByIdAndUpdate(id, { status }, { new: true });
+        if (!updated) {
+            res.status(404).json({ error: 'Inquiry not found' });
+            return;
+        }
         res.json(updated);
     }
     catch (err) {
@@ -338,16 +330,14 @@ router.patch('/leads/:id', async (req, res) => {
     }
 });
 // DELETE /api/admin/leads/:id
-// Delete an inquiry lead permanently
 router.delete('/leads/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        const existing = await db_1.default.lead.findUnique({ where: { id } });
-        if (!existing) {
+        const deleted = await Lead_1.Lead.findByIdAndDelete(id);
+        if (!deleted) {
             res.status(404).json({ error: 'Inquiry not found' });
             return;
         }
-        await db_1.default.lead.delete({ where: { id } });
         res.json({ message: 'Inquiry deleted successfully' });
     }
     catch (err) {

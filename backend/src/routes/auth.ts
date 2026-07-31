@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import prisma from '../db';
+import { User } from '../models/User';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -19,9 +19,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
   try {
     // Find user in db
-    const user = await prisma.user.findUnique({
-      where: { email: email.trim().toLowerCase() },
-    });
+    const user = await User.findOne({ email: email.trim().toLowerCase() });
 
     if (!user) {
       res.status(401).json({ error: 'Invalid email or password' });
@@ -35,9 +33,11 @@ router.post('/login', async (req: Request, res: Response) => {
       return;
     }
 
+    const userId = user._id.toString();
+
     // Create JWT
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
+      { userId, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -53,7 +53,7 @@ router.post('/login', async (req: Request, res: Response) => {
     res.json({
       message: 'Login successful',
       user: {
-        id: user.id,
+        id: userId,
         email: user.email,
         role: user.role,
       },

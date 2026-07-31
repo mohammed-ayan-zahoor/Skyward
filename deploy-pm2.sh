@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ==============================================================================
-# Skyward Automated Deployment Script for PM2 + Nginx
+# Skyward Automated Deployment Script for PM2 + Nginx + MongoDB (Pure Mongoose)
 # ==============================================================================
 
 set -e
@@ -16,10 +16,7 @@ git pull origin main
 echo "⚙️ Building Backend..."
 cd backend
 npm install --production=false
-echo "🗄️ Syncing Prisma MongoDB Schema..."
-npx prisma db push
-npx prisma generate
-echo "🔨 Compiling TypeScript..."
+echo "🔨 Compiling Express Backend..."
 npm run build
 cd ..
 

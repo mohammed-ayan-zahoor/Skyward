@@ -1,6 +1,7 @@
 import { Router, Response } from 'express';
 import { requireAdmin, AuthRequest } from '../middleware/auth';
-import prisma from '../db';
+import { Installation } from '../models/Installation';
+import { Lead } from '../models/Lead';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -10,34 +11,31 @@ const router = Router();
 // Configure storage destination dynamically based on installationId
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const id = req.params.id as string; // installationId passed in URL parameter
+    const id = req.params.id as string;
     const uploadDir = path.join(__dirname, '../../uploads/installations', id);
-    
-    // Ensure upload directory exists on disk
     fs.mkdirSync(uploadDir, { recursive: true });
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // Generate clean filename using timestamp and extension
     const ext = path.extname(file.originalname);
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, `photo-${uniqueSuffix}${ext}`);
-  }
+  },
 });
 
 const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png|webp/;;
+    const filetypes = /jpeg|jpg|png|webp/;
     const mimetype = filetypes.test(file.mimetype);
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    
+
     if (mimetype && extname) {
       return cb(null, true);
     }
     cb(new Error('Only JPEG, JPG, PNG, and WebP images are allowed.'));
-  }
+  },
 });
 
 // Protect all routes in this router with admin authentication
@@ -53,14 +51,18 @@ router.use(requireAdmin);
 // List ALL installations (both published and drafts)
 router.get('/installations', async (req: AuthRequest, res: Response) => {
   try {
-    const installations = await prisma.installation.findMany({
-      include: {
-        photos: {
-          orderBy: { sortOrder: 'asc' },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const rawInstallations = await Installation.find().sort({ createdAt: -1 }).lean();
+    const installations = rawInstallations.map((inst: any) => ({
+      ...inst,
+      id: inst._id.toString(),
+      photos: (inst.photos || []).map((p: any) => ({
+        id: p._id.toString(),
+        imageUrl: p.imageUrl,
+        caption: p.caption,
+        sortOrder: p.sortOrder,
+        isCover: p.isCover,
+      })),
+    }));
     res.json(installations);
   } catch (err) {
     console.error(err);
@@ -79,24 +81,24 @@ router.post('/installations', async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const existing = await prisma.installation.findUnique({ where: { slug } });
+    const cleanSlug = slug.toLowerCase().trim();
+    const existing = await Installation.findOne({ slug: cleanSlug });
     if (existing) {
       res.status(400).json({ error: 'An installation with this slug already exists' });
       return;
     }
 
-    const installation = await prisma.installation.create({
-      data: {
-        title,
-        slug: slug.toLowerCase().trim(),
-        location,
-        canopyType,
-        yearCompleted: Number(yearCompleted),
-        description,
-        isFeatured: Boolean(isFeatured),
-        status: status || 'draft',
-        brand: brand || null,
-      },
+    const installation = await Installation.create({
+      title,
+      slug: cleanSlug,
+      location,
+      canopyType,
+      yearCompleted: Number(yearCompleted),
+      description,
+      isFeatured: Boolean(isFeatured),
+      status: status || 'draft',
+      brand: brand || null,
+      photos: [],
     });
 
     res.status(201).json(installation);
@@ -113,37 +115,36 @@ router.put('/installations/:id', async (req: AuthRequest, res: Response) => {
   const { title, slug, location, canopyType, yearCompleted, description, isFeatured, status, coverImageId, brand } = req.body;
 
   try {
-    const existing = await prisma.installation.findUnique({ where: { id } });
-    if (!existing) {
+    const inst = await Installation.findById(id);
+    if (!inst) {
       res.status(404).json({ error: 'Installation not found' });
       return;
     }
 
-    if (slug && slug !== existing.slug) {
-      const slugConflict = await prisma.installation.findUnique({ where: { slug } });
-      if (slugConflict) {
-        res.status(400).json({ error: 'An installation with this slug already exists' });
-        return;
+    if (slug) {
+      const cleanSlug = slug.toLowerCase().trim();
+      if (cleanSlug !== inst.slug) {
+        const slugConflict = await Installation.findOne({ slug: cleanSlug });
+        if (slugConflict) {
+          res.status(400).json({ error: 'An installation with this slug already exists' });
+          return;
+        }
+        inst.slug = cleanSlug;
       }
     }
 
-    const updated = await prisma.installation.update({
-      where: { id },
-      data: {
-        ...(title && { title }),
-        ...(slug && { slug: slug.toLowerCase().trim() }),
-        ...(location && { location }),
-        ...(canopyType && { canopyType }),
-        ...(yearCompleted && { yearCompleted: Number(yearCompleted) }),
-        ...(description && { description }),
-        ...(isFeatured !== undefined && { isFeatured: Boolean(isFeatured) }),
-        ...(status && { status }),
-        ...(coverImageId !== undefined && { coverImageId }),
-        ...(brand !== undefined && { brand }),
-      },
-    });
+    if (title !== undefined) inst.title = title;
+    if (location !== undefined) inst.location = location;
+    if (canopyType !== undefined) inst.canopyType = canopyType;
+    if (yearCompleted !== undefined) inst.yearCompleted = Number(yearCompleted);
+    if (description !== undefined) inst.description = description;
+    if (isFeatured !== undefined) inst.isFeatured = Boolean(isFeatured);
+    if (status !== undefined) inst.status = status;
+    if (coverImageId !== undefined) inst.coverImageId = coverImageId;
+    if (brand !== undefined) inst.brand = brand;
 
-    res.json(updated);
+    await inst.save();
+    res.json(inst);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to update installation' });
@@ -151,18 +152,18 @@ router.put('/installations/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // DELETE /api/admin/installations/:id
-// Deletes installation (cascade deletes all related photos in db)
+// Deletes installation
 router.delete('/installations/:id', async (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
 
   try {
-    const existing = await prisma.installation.findUnique({ where: { id } });
+    const existing = await Installation.findById(id);
     if (!existing) {
       res.status(404).json({ error: 'Installation not found' });
       return;
     }
 
-    await prisma.installation.delete({ where: { id } });
+    await Installation.findByIdAndDelete(id);
     res.json({ message: 'Installation deleted successfully' });
   } catch (err) {
     console.error(err);
@@ -171,7 +172,7 @@ router.delete('/installations/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // POST /api/admin/installations/:id/upload
-// Upload an image file for an installation, save it on disk, and create db photo reference
+// Upload an image file for an installation, save it on disk, and add photo reference
 router.post('/installations/:id/upload', (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
 
@@ -187,37 +188,36 @@ router.post('/installations/:id/upload', (req: AuthRequest, res: Response) => {
     }
 
     try {
-      const inst = await prisma.installation.findUnique({ where: { id } });
+      const inst = await Installation.findById(id);
       if (!inst) {
         res.status(404).json({ error: 'Installation not found' });
         return;
       }
 
-      // Generate the public web path
       const imageUrl = `/uploads/installations/${id}/${req.file.filename}`;
+      const isCover = inst.photos.length === 0;
 
-      // Check if this is the first photo of the installation (so we make it the cover by default)
-      const photoCount = await prisma.photo.count({ where: { installationId: id } });
-      const isCover = photoCount === 0;
+      const newPhoto = {
+        imageUrl,
+        isCover,
+        sortOrder: inst.photos.length,
+      };
 
-      const photo = await prisma.photo.create({
-        data: {
-          installationId: id,
-          imageUrl,
-          isCover,
-          sortOrder: photoCount,
-        }
-      });
+      inst.photos.push(newPhoto as any);
+      const addedPhoto = inst.photos[inst.photos.length - 1];
 
-      // Update coverImageId on installation if this is the cover photo
       if (isCover) {
-        await prisma.installation.update({
-          where: { id },
-          data: { coverImageId: photo.id }
-        });
+        inst.coverImageId = (addedPhoto as any)._id.toString();
       }
 
-      res.status(201).json(photo);
+      await inst.save();
+
+      res.status(201).json({
+        id: (addedPhoto as any)._id.toString(),
+        imageUrl: addedPhoto.imageUrl,
+        isCover: addedPhoto.isCover,
+        sortOrder: addedPhoto.sortOrder,
+      });
     } catch (dbErr) {
       console.error(dbErr);
       res.status(500).json({ error: 'Failed to save photo metadata in database' });
@@ -232,9 +232,8 @@ router.post('/installations/:id/upload', (req: AuthRequest, res: Response) => {
  */
 
 // POST /api/admin/installations/:id/photos
-// Add a photo reference to an installation
 router.post('/installations/:id/photos', async (req: AuthRequest, res: Response) => {
-  const id = req.params.id as string; // installationId
+  const id = req.params.id as string;
   const { imageUrl, caption, sortOrder, isCover } = req.body;
 
   if (!imageUrl) {
@@ -243,39 +242,40 @@ router.post('/installations/:id/photos', async (req: AuthRequest, res: Response)
   }
 
   try {
-    const inst = await prisma.installation.findUnique({ where: { id } });
+    const inst = await Installation.findById(id);
     if (!inst) {
       res.status(404).json({ error: 'Installation not found' });
       return;
     }
 
-    // If isCover is true, set all other photos of this installation to false
     if (isCover) {
-      await prisma.photo.updateMany({
-        where: { installationId: id },
-        data: { isCover: false },
-      });
+      inst.photos.forEach((p) => { p.isCover = false; });
     }
 
-    const photo = await prisma.photo.create({
-      data: {
-        installationId: id,
-        imageUrl,
-        caption,
-        sortOrder: Number(sortOrder || 0),
-        isCover: Boolean(isCover),
-      },
-    });
+    const newPhoto = {
+      imageUrl,
+      caption,
+      sortOrder: Number(sortOrder || 0),
+      isCover: Boolean(isCover),
+    };
 
-    // If this is the first photo or marked as cover, auto-update installation coverImageId
+    inst.photos.push(newPhoto as any);
+    const addedPhoto = inst.photos[inst.photos.length - 1];
+    const photoId = (addedPhoto as any)._id.toString();
+
     if (isCover || !inst.coverImageId) {
-      await prisma.installation.update({
-        where: { id },
-        data: { coverImageId: photo.id },
-      });
+      inst.coverImageId = photoId;
     }
 
-    res.status(201).json(photo);
+    await inst.save();
+
+    res.status(201).json({
+      id: photoId,
+      imageUrl: addedPhoto.imageUrl,
+      caption: addedPhoto.caption,
+      sortOrder: addedPhoto.sortOrder,
+      isCover: addedPhoto.isCover,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to add photo' });
@@ -283,44 +283,28 @@ router.post('/installations/:id/photos', async (req: AuthRequest, res: Response)
 });
 
 // DELETE /api/admin/photos/:id
-// Remove a photo from an installation
 router.delete('/photos/:id', async (req: AuthRequest, res: Response) => {
-  const id = req.params.id as string;
+  const photoId = req.params.id as string;
 
   try {
-    const photo = await prisma.photo.findUnique({ where: { id } });
-    if (!photo) {
+    const inst = await Installation.findOne({ 'photos._id': photoId });
+    if (!inst) {
       res.status(404).json({ error: 'Photo not found' });
       return;
     }
 
-    await prisma.photo.delete({ where: { id } });
+    inst.photos = inst.photos.filter((p: any) => p._id.toString() !== photoId) as any;
 
-    // If we deleted the cover photo, unset coverImageId on installation or pick the next one
-    const inst = await prisma.installation.findUnique({
-      where: { id: photo.installationId },
-      include: { photos: true },
-    });
-
-    if (inst && inst.coverImageId === id) {
-      const nextCover = inst.photos[0]; // pick first available
-      if (nextCover) {
-        await prisma.photo.update({
-          where: { id: nextCover.id },
-          data: { isCover: true },
-        });
-        await prisma.installation.update({
-          where: { id: inst.id },
-          data: { coverImageId: nextCover.id },
-        });
+    if (inst.coverImageId === photoId) {
+      if (inst.photos.length > 0) {
+        inst.photos[0].isCover = true;
+        inst.coverImageId = (inst.photos[0] as any)._id.toString();
       } else {
-        await prisma.installation.update({
-          where: { id: inst.id },
-          data: { coverImageId: null },
-        });
+        inst.coverImageId = undefined;
       }
     }
 
+    await inst.save();
     res.json({ message: 'Photo deleted successfully' });
   } catch (err) {
     console.error(err);
@@ -335,12 +319,13 @@ router.delete('/photos/:id', async (req: AuthRequest, res: Response) => {
  */
 
 // GET /api/admin/leads
-// List all leads/inquiries
 router.get('/leads', async (req: AuthRequest, res: Response) => {
   try {
-    const leads = await prisma.lead.findMany({
-      orderBy: { submittedAt: 'desc' },
-    });
+    const rawLeads = await Lead.find().sort({ submittedAt: -1 }).lean();
+    const leads = rawLeads.map((l: any) => ({
+      ...l,
+      id: l._id.toString(),
+    }));
     res.json(leads);
   } catch (err) {
     console.error(err);
@@ -349,7 +334,6 @@ router.get('/leads', async (req: AuthRequest, res: Response) => {
 });
 
 // PATCH /api/admin/leads/:id
-// Update status of an inquiry (e.g. mark as contacted, closed)
 router.patch('/leads/:id', async (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
   const { status } = req.body;
@@ -360,10 +344,11 @@ router.patch('/leads/:id', async (req: AuthRequest, res: Response) => {
   }
 
   try {
-    const updated = await prisma.lead.update({
-      where: { id },
-      data: { status },
-    });
+    const updated = await Lead.findByIdAndUpdate(id, { status }, { new: true });
+    if (!updated) {
+      res.status(404).json({ error: 'Inquiry not found' });
+      return;
+    }
     res.json(updated);
   } catch (err) {
     console.error(err);
@@ -372,18 +357,15 @@ router.patch('/leads/:id', async (req: AuthRequest, res: Response) => {
 });
 
 // DELETE /api/admin/leads/:id
-// Delete an inquiry lead permanently
 router.delete('/leads/:id', async (req: AuthRequest, res: Response) => {
   const id = req.params.id as string;
 
   try {
-    const existing = await prisma.lead.findUnique({ where: { id } });
-    if (!existing) {
+    const deleted = await Lead.findByIdAndDelete(id);
+    if (!deleted) {
       res.status(404).json({ error: 'Inquiry not found' });
       return;
     }
-
-    await prisma.lead.delete({ where: { id } });
     res.json({ message: 'Inquiry deleted successfully' });
   } catch (err) {
     console.error(err);

@@ -1,10 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const db_1 = __importDefault(require("../db"));
+const Lead_1 = require("../models/Lead");
 const router = (0, express_1.Router)();
 // POST /api/leads
 // Public route to submit the contact/quote form
@@ -28,18 +25,16 @@ router.post('/', async (req, res) => {
         return;
     }
     try {
-        const newLead = await db_1.default.lead.create({
-            data: {
-                name: name.trim(),
-                email: email.trim().toLowerCase(),
-                phone: phone.trim(),
-                message: message.trim(),
-            },
+        const newLead = await Lead_1.Lead.create({
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            phone: phone.trim(),
+            message: message.trim(),
         });
         res.status(201).json({
             message: 'Inquiry submitted successfully',
             lead: {
-                id: newLead.id,
+                id: newLead._id.toString(),
                 name: newLead.name,
                 submittedAt: newLead.submittedAt,
             },

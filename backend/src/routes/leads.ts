@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import prisma from '../db';
+import { Lead } from '../models/Lead';
 
 const router = Router();
 
@@ -27,19 +27,17 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    const newLead = await prisma.lead.create({
-      data: {
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        phone: phone.trim(),
-        message: message.trim(),
-      },
+    const newLead = await Lead.create({
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      message: message.trim(),
     });
 
     res.status(201).json({
       message: 'Inquiry submitted successfully',
       lead: {
-        id: newLead.id,
+        id: newLead._id.toString(),
         name: newLead.name,
         submittedAt: newLead.submittedAt,
       },

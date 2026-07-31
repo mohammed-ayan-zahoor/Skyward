@@ -6,16 +6,17 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "seed": "ts-node src/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
     "multer": "^2.2.0"
   },
   "devDependencies": {
@@ -27,11 +28,7 @@
     "@types/multer": "^2.2.0",
     "@types/node": "^20.17.6",
     "nodemon": "^3.1.7",
-    "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   }
 }

@@ -1,6 +1,6 @@
 # 🚀 Skyward VPS Deployment Guide (PM2 + Nginx + MongoDB)
 
-This guide walks you through deploying **Skyward** on your VPS using **MongoDB**, alongside your existing PM2 and Nginx applications.
+This guide walks you through deploying **Skyward** on your VPS using your existing **MongoDB** server, PM2, and Nginx. Zero Prisma setup required.
 
 Skyward is configured to use dedicated non-conflicting ports:
 - **Backend Express API**: Port `7001`
@@ -28,7 +28,7 @@ cd skyward
 cp backend/.env.example backend/.env
 nano backend/.env
 ```
-Update `DATABASE_URL` with your MongoDB connection string (pointing to your existing MongoDB server):
+Set your MongoDB connection string (pointing to your existing MongoDB server):
 ```env
 PORT=7001
 NODE_ENV=production
@@ -48,14 +48,14 @@ NEXT_PUBLIC_API_URL="https://skyward.yourdomain.com"
 
 ---
 
-## Step 3: Run Initial Database Seed (Creates Default Admin User)
+## Step 3: Seed Database (Creates Default Admin User)
 
-Run the Prisma seed command to push schema indexes to MongoDB and create your initial admin account (`admin@skywardcanopies.com` / `admin123`):
+Run the Mongoose seed script to create your initial admin account (`admin@skywardcanopies.com` / `admin123`) and sample installations in MongoDB:
 
 ```bash
 cd backend
-npx prisma db push
-npx prisma db seed
+npm install
+npm run seed
 cd ..
 ```
 
@@ -72,10 +72,9 @@ chmod +x deploy-pm2.sh
 
 This automated script will:
 1. Pull latest code from `main`.
-2. Sync schema to MongoDB via Prisma (`prisma db push`).
-3. Compile the Express TypeScript backend.
-4. Build the Next.js production frontend.
-5. Launch/Reload `skyward-backend` and `skyward-frontend` in PM2.
+2. Compile the Express TypeScript backend.
+3. Build the Next.js production frontend.
+4. Launch/Reload `skyward-backend` and `skyward-frontend` in PM2.
 
 Check PM2 status:
 ```bash
@@ -119,4 +118,4 @@ cd /var/www/skyward
 ./deploy-pm2.sh
 ```
 
-Your server will update code, sync MongoDB schema, re-build Next.js, and perform a zero-downtime reload in PM2! 🎉
+Your server will update code, re-build Next.js, and perform a zero-downtime reload in PM2! 🎉

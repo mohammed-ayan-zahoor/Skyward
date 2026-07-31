@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const db_1 = __importDefault(require("../db"));
+const User_1 = require("../models/User");
 const auth_1 = require("../middleware/auth");
 const router = (0, express_1.Router)();
 const JWT_SECRET = process.env.JWT_SECRET || 'replace-with-a-secure-random-secret-key';
@@ -20,9 +20,7 @@ router.post('/login', async (req, res) => {
     }
     try {
         // Find user in db
-        const user = await db_1.default.user.findUnique({
-            where: { email: email.trim().toLowerCase() },
-        });
+        const user = await User_1.User.findOne({ email: email.trim().toLowerCase() });
         if (!user) {
             res.status(401).json({ error: 'Invalid email or password' });
             return;
@@ -33,8 +31,9 @@ router.post('/login', async (req, res) => {
             res.status(401).json({ error: 'Invalid email or password' });
             return;
         }
+        const userId = user._id.toString();
         // Create JWT
-        const token = jsonwebtoken_1.default.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
+        const token = jsonwebtoken_1.default.sign({ userId, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
         // Set cookie
         res.cookie('token', token, {
             httpOnly: true, // Prevents JavaScript XSS access
@@ -45,7 +44,7 @@ router.post('/login', async (req, res) => {
         res.json({
             message: 'Login successful',
             user: {
-                id: user.id,
+                id: userId,
                 email: user.email,
                 role: user.role,
             },
