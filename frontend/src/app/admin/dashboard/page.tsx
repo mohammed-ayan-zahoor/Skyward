@@ -28,7 +28,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Star, Trash } from "reicon-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface Photo {

@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { ArrowRight, Location, Setting, Calendar } from "reicon-react";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface ApiInstallation {
   id: string;

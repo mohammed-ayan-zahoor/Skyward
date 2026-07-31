@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Location, Setting, Calendar, Star, ArrowRight, ShieldAlert, Download, CheckCircle, Phone } from "reicon-react";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 interface Photo {
   id: string;

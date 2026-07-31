@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Star } from "reicon-react";
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const API = process.env.NEXT_PUBLIC_API_URL || "";
 
 export const metadata: Metadata = {
   title: "About Skyward — B2B Structural Canopy Fabricator",
