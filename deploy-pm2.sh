@@ -16,8 +16,8 @@ git pull origin main
 echo "⚙️ Building Backend..."
 cd backend
 npm install --production=false
-echo "🗄️ Running Prisma Database Migrations..."
-npx prisma migrate deploy
+echo "🗄️ Syncing Prisma MongoDB Schema..."
+npx prisma db push
 npx prisma generate
 echo "🔨 Compiling TypeScript..."
 npm run build

@@ -1,6 +1,6 @@
-# 🚀 Skyward VPS Deployment Guide (PM2 + Nginx + PostgreSQL)
+# 🚀 Skyward VPS Deployment Guide (PM2 + Nginx + MongoDB)
 
-This guide walks you through deploying **Skyward** on your VPS alongside your existing PM2, Nginx, and MongoDB applications.
+This guide walks you through deploying **Skyward** on your VPS using **MongoDB**, alongside your existing PM2 and Nginx applications.
 
 Skyward is configured to use dedicated non-conflicting ports:
 - **Backend Express API**: Port `7001`
@@ -9,34 +9,7 @@ Skyward is configured to use dedicated non-conflicting ports:
 
 ---
 
-## Step 1: Install & Set Up PostgreSQL (One-Time Setup)
-
-If PostgreSQL is not already installed on your server:
-
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib -y
-```
-
-Log in to PostgreSQL CLI and create the `skyward_db` database and user:
-
-```bash
-sudo -u postgres psql
-```
-
-Inside the `psql` prompt, run:
-
-```sql
-CREATE DATABASE skyward_db;
-CREATE USER skyward_user WITH PASSWORD 'choose_a_strong_password';
-GRANT ALL PRIVILEGES ON DATABASE skyward_db TO skyward_user;
-ALTER DATABASE skyward_db OWNER TO skyward_user;
-\q
-```
-
----
-
-## Step 2: Clone Skyward Project to Your Server
+## Step 1: Clone Skyward Project to Your Server
 
 Navigate to your web directory (e.g. `/var/www/`):
 
@@ -48,18 +21,18 @@ cd skyward
 
 ---
 
-## Step 3: Configure Environment Variables
+## Step 2: Configure Environment Variables
 
 ### 1. Create `backend/.env`:
 ```bash
 cp backend/.env.example backend/.env
 nano backend/.env
 ```
-Update `DATABASE_URL` with the password you created in Step 1:
+Update `DATABASE_URL` with your MongoDB connection string (pointing to your existing MongoDB server):
 ```env
 PORT=7001
 NODE_ENV=production
-DATABASE_URL="postgresql://skyward_user:choose_a_strong_password@localhost:5432/skyward_db?schema=public"
+DATABASE_URL="mongodb://127.0.0.1:27017/skyward_db"
 JWT_SECRET="generate_a_random_jwt_secret_here"
 FRONTEND_URL="https://skyward.yourdomain.com"
 ```
@@ -75,19 +48,20 @@ NEXT_PUBLIC_API_URL="https://skyward.yourdomain.com"
 
 ---
 
-## Step 4: Run Initial Seed (Creates Default Admin User)
+## Step 3: Run Initial Database Seed (Creates Default Admin User)
 
-Run the Prisma seed command to generate your initial admin account (`admin@skywardcanopies.com` / `admin123`):
+Run the Prisma seed command to push schema indexes to MongoDB and create your initial admin account (`admin@skywardcanopies.com` / `admin123`):
 
 ```bash
 cd backend
+npx prisma db push
 npx prisma db seed
 cd ..
 ```
 
 ---
 
-## Step 5: Execute 1-Click Deployment Script
+## Step 4: Execute 1-Click Deployment Script
 
 Make `deploy-pm2.sh` executable and run it:
 
@@ -98,7 +72,7 @@ chmod +x deploy-pm2.sh
 
 This automated script will:
 1. Pull latest code from `main`.
-2. Run database migrations via Prisma (`prisma migrate deploy`).
+2. Sync schema to MongoDB via Prisma (`prisma db push`).
 3. Compile the Express TypeScript backend.
 4. Build the Next.js production frontend.
 5. Launch/Reload `skyward-backend` and `skyward-frontend` in PM2.
@@ -113,7 +87,7 @@ You should see:
 
 ---
 
-## Step 6: Configure Nginx & SSL Certificate
+## Step 5: Configure Nginx & SSL Certificate
 
 ### 1. Copy Nginx server block:
 ```bash
@@ -145,4 +119,4 @@ cd /var/www/skyward
 ./deploy-pm2.sh
 ```
 
-Your server will update code, run database migrations, re-build Next.js, and perform a zero-downtime reload in PM2! 🎉
+Your server will update code, sync MongoDB schema, re-build Next.js, and perform a zero-downtime reload in PM2! 🎉
