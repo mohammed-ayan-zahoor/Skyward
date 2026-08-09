@@ -10,6 +10,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const path_1 = __importDefault(require("path"));
 const db_1 = require("./db");
 const installations_1 = __importDefault(require("./routes/installations"));
+const products_1 = __importDefault(require("./routes/products"));
 const leads_1 = __importDefault(require("./routes/leads"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const admin_1 = __importDefault(require("./routes/admin"));
@@ -27,6 +28,7 @@ app.use((0, cookie_parser_1.default)());
 app.use('/uploads', express_1.default.static(path_1.default.join(__dirname, '../uploads')));
 // Routes
 app.use('/api/installations', installations_1.default);
+app.use('/api/products', products_1.default);
 app.use('/api/leads', leads_1.default);
 app.use('/api/auth', auth_1.default);
 app.use('/api/admin', admin_1.default);

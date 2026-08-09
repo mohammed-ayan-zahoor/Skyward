@@ -7,6 +7,7 @@ const express_1 = require("express");
 const auth_1 = require("../middleware/auth");
 const Installation_1 = require("../models/Installation");
 const Lead_1 = require("../models/Lead");
+const Product_1 = require("../models/Product");
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -28,6 +29,33 @@ const storage = multer_1.default.diskStorage({
 const upload = (0, multer_1.default)({
     storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+        const filetypes = /jpeg|jpg|png|webp/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname = filetypes.test(path_1.default.extname(file.originalname).toLowerCase());
+        if (mimetype && extname) {
+            return cb(null, true);
+        }
+        cb(new Error('Only JPEG, JPG, PNG, and WebP images are allowed.'));
+    },
+});
+// Configure product photo storage
+const productStorage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        const id = req.params.id;
+        const uploadDir = path_1.default.join(__dirname, '../../uploads/products', id);
+        fs_1.default.mkdirSync(uploadDir, { recursive: true });
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const ext = path_1.default.extname(file.originalname);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, `prod-${uniqueSuffix}${ext}`);
+    },
+});
+const productUpload = (0, multer_1.default)({
+    storage: productStorage,
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         const filetypes = /jpeg|jpg|png|webp/;
         const mimetype = filetypes.test(file.mimetype);
@@ -286,6 +314,177 @@ router.delete('/photos/:id', async (req, res) => {
     catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Failed to delete photo' });
+    }
+});
+/**
+ * ==========================================
+ * PRODUCT CRUD
+ * ==========================================
+ */
+// GET /api/admin/products
+router.get('/products', async (req, res) => {
+    try {
+        const rawProducts = await Product_1.Product.find().sort({ createdAt: -1 }).lean();
+        const products = rawProducts.map((p) => ({
+            ...p,
+            id: p._id.toString(),
+            photos: (p.photos || []).map((ph) => ({
+                id: ph._id.toString(),
+                imageUrl: ph.imageUrl,
+                caption: ph.caption,
+                sortOrder: ph.sortOrder,
+                isCover: ph.isCover,
+            })),
+        }));
+        res.json(products);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to retrieve products' });
+    }
+});
+// POST /api/admin/products
+router.post('/products', async (req, res) => {
+    const { title, slug, category, description, specifications, status } = req.body;
+    if (!title || !slug || !category || !description) {
+        res.status(400).json({ error: 'Missing required product fields' });
+        return;
+    }
+    try {
+        const cleanSlug = slug.toLowerCase().trim();
+        const existing = await Product_1.Product.findOne({ slug: cleanSlug });
+        if (existing) {
+            res.status(400).json({ error: 'A product with this slug already exists' });
+            return;
+        }
+        const product = await Product_1.Product.create({
+            title,
+            slug: cleanSlug,
+            category,
+            description,
+            specifications: specifications || '',
+            status: status || 'published',
+            photos: [],
+        });
+        res.status(201).json(product);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to create product' });
+    }
+});
+// PUT /api/admin/products/:id
+router.put('/products/:id', async (req, res) => {
+    const id = req.params.id;
+    const { title, slug, category, description, specifications, status } = req.body;
+    try {
+        const prod = await Product_1.Product.findById(id);
+        if (!prod) {
+            res.status(404).json({ error: 'Product not found' });
+            return;
+        }
+        if (slug) {
+            const cleanSlug = slug.toLowerCase().trim();
+            if (cleanSlug !== prod.slug) {
+                const slugConflict = await Product_1.Product.findOne({ slug: cleanSlug });
+                if (slugConflict) {
+                    res.status(400).json({ error: 'A product with this slug already exists' });
+                    return;
+                }
+                prod.slug = cleanSlug;
+            }
+        }
+        if (title !== undefined)
+            prod.title = title;
+        if (category !== undefined)
+            prod.category = category;
+        if (description !== undefined)
+            prod.description = description;
+        if (specifications !== undefined)
+            prod.specifications = specifications;
+        if (status !== undefined)
+            prod.status = status;
+        await prod.save();
+        res.json(prod);
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update product' });
+    }
+});
+// DELETE /api/admin/products/:id
+router.delete('/products/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const deleted = await Product_1.Product.findByIdAndDelete(id);
+        if (!deleted) {
+            res.status(404).json({ error: 'Product not found' });
+            return;
+        }
+        res.json({ message: 'Product deleted successfully' });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete product' });
+    }
+});
+// POST /api/admin/products/:id/upload
+router.post('/products/:id/upload', (req, res) => {
+    const id = req.params.id;
+    productUpload.single('photo')(req, res, async (err) => {
+        if (err) {
+            res.status(400).json({ error: err.message || 'File upload failed' });
+            return;
+        }
+        if (!req.file) {
+            res.status(400).json({ error: 'No file uploaded' });
+            return;
+        }
+        try {
+            const prod = await Product_1.Product.findById(id);
+            if (!prod) {
+                res.status(404).json({ error: 'Product not found' });
+                return;
+            }
+            const imageUrl = `/uploads/products/${id}/${req.file.filename}`;
+            const isCover = prod.photos.length === 0;
+            const newPhoto = {
+                imageUrl,
+                isCover,
+                sortOrder: prod.photos.length,
+            };
+            prod.photos.push(newPhoto);
+            const addedPhoto = prod.photos[prod.photos.length - 1];
+            await prod.save();
+            res.status(201).json({
+                id: addedPhoto._id.toString(),
+                imageUrl: addedPhoto.imageUrl,
+                isCover: addedPhoto.isCover,
+                sortOrder: addedPhoto.sortOrder,
+            });
+        }
+        catch (dbErr) {
+            console.error(dbErr);
+            res.status(500).json({ error: 'Failed to save product photo' });
+        }
+    });
+});
+// DELETE /api/admin/products/photos/:id
+router.delete('/products/photos/:id', async (req, res) => {
+    const photoId = req.params.id;
+    try {
+        const prod = await Product_1.Product.findOne({ 'photos._id': photoId });
+        if (!prod) {
+            res.status(404).json({ error: 'Photo not found' });
+            return;
+        }
+        prod.photos = prod.photos.filter((p) => p._id.toString() !== photoId);
+        await prod.save();
+        res.json({ message: 'Product photo deleted successfully' });
+    }
+    catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to delete product photo' });
     }
 });
 /**

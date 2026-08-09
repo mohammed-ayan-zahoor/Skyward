@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { connectDB } from './db';
 import installationsRouter from './routes/installations';
+import productsRouter from './routes/products';
 import leadsRouter from './routes/leads';
 import authRouter from './routes/auth';
 import adminRouter from './routes/admin';
@@ -26,6 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api/installations', installationsRouter);
+app.use('/api/products', productsRouter);
 app.use('/api/leads', leadsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/admin', adminRouter);

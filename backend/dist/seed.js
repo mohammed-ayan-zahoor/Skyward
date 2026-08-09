@@ -8,6 +8,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const User_1 = require("./models/User");
 const Installation_1 = require("./models/Installation");
+const Product_1 = require("./models/Product");
 const mongoURI = process.env.DATABASE_URL || 'mongodb://127.0.0.1:27017/skyward_db';
 async function seed() {
     console.log('Start seeding MongoDB...');
@@ -15,6 +16,7 @@ async function seed() {
     // 1. Clear existing database collections
     await User_1.User.deleteMany({});
     await Installation_1.Installation.deleteMany({});
+    await Product_1.Product.deleteMany({});
     console.log('Cleared existing MongoDB records.');
     // 2. Create default Admin User
     const passwordHash = await bcrypt_1.default.hash('Sky@563119', 10);
@@ -84,6 +86,40 @@ async function seed() {
         photos: [
             { imageUrl: getPlaceholderUrl(210), caption: 'Highway-facing view of the main canopy', sortOrder: 0, isCover: true },
             { imageUrl: getPlaceholderUrl(211), caption: 'Multi-island dispenser layout', sortOrder: 1, isCover: false },
+        ],
+    });
+    // 4. Seed Products / Services Catalog
+    await Product_1.Product.create({
+        title: 'Pre-Engineered Building (PEB) Industrial Shed',
+        slug: 'peb-industrial-shed',
+        category: 'peb',
+        description: 'Custom-designed Pre-Engineered Building (PEB) structural steel framing for factories, manufacturing plants, and industrial logistics facilities.',
+        specifications: 'Grade 350 Steel, Wind Speed Rating 160 km/h, Clear-span up to 60m',
+        status: 'published',
+        photos: [
+            { imageUrl: getPlaceholderUrl(301), caption: 'PEB Frame Assembly Overview', sortOrder: 0, isCover: true }
+        ],
+    });
+    await Product_1.Product.create({
+        title: 'High-Capacity Storage Warehouse Facility',
+        slug: 'high-capacity-warehouse',
+        category: 'warehouse',
+        description: 'Heavy-duty structural warehouse featuring high-ceiling clearance, insulated roofing sheets, and reinforced loading dock canopy overhangs.',
+        specifications: 'Galvalume Standing Seam Roof, Insulated Sandwich Panels, EOT Crane Compatibility',
+        status: 'published',
+        photos: [
+            { imageUrl: getPlaceholderUrl(302), caption: 'Logistics Warehouse Structural Framing', sortOrder: 0, isCover: true }
+        ],
+    });
+    await Product_1.Product.create({
+        title: 'Double-Cantilever Fuel Station Canopy System',
+        slug: 'cantilever-fuel-canopy',
+        category: 'other',
+        description: 'B2B certified fuel dispenser canopy system engineered with internal storm drainage, illuminated ACP fascia cladding, and state-certified wind load calculations.',
+        specifications: 'IS 800:2007 Compliant, ACP Fascia Cladding, Waterproof Ceiling Systems',
+        status: 'published',
+        photos: [
+            { imageUrl: getPlaceholderUrl(303), caption: 'Cantilever Fuel Canopy Structure', sortOrder: 0, isCover: true }
         ],
     });
     console.log('MongoDB database seeding completed successfully!');
