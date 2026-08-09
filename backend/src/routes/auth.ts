@@ -42,10 +42,12 @@ router.post('/login', async (req: Request, res: Response) => {
       { expiresIn: '1d' }
     );
 
+    const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+
     // Set cookie
     res.cookie('token', token, {
       httpOnly: true, // Prevents JavaScript XSS access
-      secure: process.env.NODE_ENV === 'production', // https only in prod
+      secure: isSecure, // Only set Secure flag when request is actually HTTPS
       sameSite: 'lax', // standard CSRF protection
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
@@ -67,9 +69,10 @@ router.post('/login', async (req: Request, res: Response) => {
 // POST /api/auth/logout
 // Public route to clear the auth session cookie
 router.post('/logout', (req: Request, res: Response) => {
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
   res.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isSecure,
     sameSite: 'lax',
   });
   res.json({ message: 'Logged out successfully' });
