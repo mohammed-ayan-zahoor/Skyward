@@ -198,7 +198,7 @@ export default function AdminDashboard() {
     setSheetOpen(true);
   }
 
-  async function saveWork() {
+  async function saveWork(keepOpen: boolean = false) {
     setSaving(true);
     try {
       const url = isNew
@@ -212,8 +212,17 @@ export default function AdminDashboard() {
         body: JSON.stringify(editing),
       });
       if (r.ok) {
-        setSheetOpen(false);
+        const saved = await r.json();
         await fetchWorks();
+        if (isNew || keepOpen) {
+          setEditing({
+            ...saved,
+            canopyType: normalizeCategory(saved.canopyType),
+          });
+          setIsNew(false);
+        } else {
+          setSheetOpen(false);
+        }
       }
     } finally {
       setSaving(false);
@@ -757,101 +766,115 @@ export default function AdminDashboard() {
               </Label>
             </div>
 
-            {/* ── Photo Management Section (Edit Mode Only) ── */}
-            {!isNew && editing.id && (
+            {/* ── Photo Management Section ── */}
+            {isNew ? (
               <>
                 <Separator className="my-2 bg-slate-100" />
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-mono text-[10px] uppercase tracking-widest text-[#E8891C] font-bold">
-                      Site Photo Registry
-                    </h3>
-                    <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 mt-0.5">
-                      Upload site images to disk. First photo becomes cover.
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold block">
-                      Add site Photo
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={handlePhotoUpload}
-                        disabled={uploading}
-                        className="rounded-[4px] font-mono text-xs cursor-pointer border-dashed border-slate-300 py-1 file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-[#1C2B36] file:text-white hover:border-[#E8891C] transition-colors h-11"
-                      />
+                <div className="space-y-3 border border-dashed border-amber-300/80 bg-amber-50/60 p-4 rounded-[4px]">
+                  <h3 className="font-mono text-[10px] uppercase tracking-widest text-amber-900 font-bold">
+                    Site Photo Registry
+                  </h3>
+                  <p className="font-mono text-[9px] uppercase tracking-wider text-slate-600 leading-relaxed">
+                    Photos can be uploaded immediately after saving the job record. Click <strong>"Create & Add Photos"</strong> below to save this job and unlock image uploads.
+                  </p>
+                </div>
+              </>
+            ) : (
+              editing.id && (
+                <>
+                  <Separator className="my-2 bg-slate-100" />
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-mono text-[10px] uppercase tracking-widest text-[#E8891C] font-bold">
+                        Site Photo Registry
+                      </h3>
+                      <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 mt-0.5">
+                        Upload site images to disk. First photo becomes cover.
+                      </p>
                     </div>
-                    {uploading && (
-                      <p className="font-mono text-[9px] text-[#E8891C] animate-pulse uppercase tracking-wider font-semibold">
-                        Uploading file payload...
+
+                    <div className="space-y-2">
+                      <Label className="font-mono text-[10px] uppercase tracking-widest text-slate-500 font-bold block">
+                        Add site Photo
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          onChange={handlePhotoUpload}
+                          disabled={uploading}
+                          className="rounded-[4px] font-mono text-xs cursor-pointer border-dashed border-slate-300 py-1 file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-bold file:bg-[#1C2B36] file:text-white hover:border-[#E8891C] transition-colors h-11"
+                        />
+                      </div>
+                      {uploading && (
+                        <p className="font-mono text-[9px] text-[#E8891C] animate-pulse uppercase tracking-wider font-semibold">
+                          Uploading file payload...
+                        </p>
+                      )}
+                    </div>
+
+                    {editing.photos && editing.photos.length > 0 ? (
+                      <div className="grid grid-cols-3 gap-3">
+                        {editing.photos.map((p) => {
+                          const isCover = editing.coverImageId === p.id;
+                          return (
+                            <div key={p.id} className="relative group aspect-video border border-slate-200 rounded-[2px] overflow-hidden bg-slate-50">
+                              <img
+                                src={`${API}${p.imageUrl}`}
+                                alt={editing.title}
+                                className="w-full h-full object-cover"
+                              />
+                              
+                              {/* Overlay Controls */}
+                              <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setCoverPhoto(p.id)}
+                                  className={`p-1.5 rounded-[2px] bg-white transition-colors cursor-pointer border-none ${
+                                    isCover ? "text-amber-500" : "text-slate-450 hover:text-amber-500"
+                                  }`}
+                                  title={isCover ? "Cover Image" : "Make Cover"}
+                                >
+                                  <Star className="w-3.5 h-3.5" weight={isCover ? "Filled" : "Outline"} />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => deletePhoto(p.id)}
+                                  className="p-1.5 rounded-[2px] bg-white text-red-650 hover:text-red-750 transition-colors cursor-pointer border-none"
+                                  title="Remove Photo"
+                                >
+                                  <Trash className="w-3.5 h-3.5" weight="Filled" />
+                                </button>
+                              </div>
+                              
+                              {/* Cover Badge indicator */}
+                              {isCover && (
+                                <div className="absolute top-1 left-1 bg-amber-500 text-white font-mono text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-[2px]">
+                                  COVER
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 py-4 text-center border border-dashed border-slate-200">
+                        No site images registered.
                       </p>
                     )}
                   </div>
-
-                  {editing.photos && editing.photos.length > 0 ? (
-                    <div className="grid grid-cols-3 gap-3">
-                      {editing.photos.map((p) => {
-                        const isCover = editing.coverImageId === p.id;
-                        return (
-                          <div key={p.id} className="relative group aspect-video border border-slate-200 rounded-[2px] overflow-hidden bg-slate-50">
-                            <img
-                              src={`${API}${p.imageUrl}`}
-                              alt={editing.title}
-                              className="w-full h-full object-cover"
-                            />
-                            
-                            {/* Overlay Controls */}
-                            <div className="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => setCoverPhoto(p.id)}
-                                className={`p-1.5 rounded-[2px] bg-white transition-colors cursor-pointer border-none ${
-                                  isCover ? "text-amber-500" : "text-slate-450 hover:text-amber-500"
-                                }`}
-                                title={isCover ? "Cover Image" : "Make Cover"}
-                              >
-                                <Star className="w-3.5 h-3.5" weight={isCover ? "Filled" : "Outline"} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => deletePhoto(p.id)}
-                                className="p-1.5 rounded-[2px] bg-white text-red-650 hover:text-red-750 transition-colors cursor-pointer border-none"
-                                title="Remove Photo"
-                              >
-                                <Trash className="w-3.5 h-3.5" weight="Filled" />
-                              </button>
-                            </div>
-                            
-                            {/* Cover Badge indicator */}
-                            {isCover && (
-                              <div className="absolute top-1 left-1 bg-amber-500 text-white font-mono text-[7px] font-bold uppercase tracking-wider px-1 py-0.5 rounded-[2px]">
-                                COVER
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="font-mono text-[9px] uppercase tracking-wider text-slate-400 py-4 text-center border border-dashed border-slate-200">
-                      No site images registered.
-                    </p>
-                  )}
-                </div>
-              </>
+                </>
+              )
             )}
           </div>
 
           <div className="flex gap-3 pt-6 border-t border-slate-100 mt-auto">
             <Button
-              onClick={saveWork}
+              onClick={() => saveWork(isNew)}
               disabled={saving}
               className="flex-1 rounded-[4px] font-mono text-[11px] uppercase tracking-widest bg-[#1C2B36] hover:bg-[#1C2B36]/90 text-white h-10 font-bold cursor-pointer"
             >
-              {saving ? "Saving..." : isNew ? "Create Record" : "Save Changes"}
+              {saving ? "Saving..." : isNew ? "Create & Add Photos" : "Save Changes"}
             </Button>
             <Button
               variant="outline"
