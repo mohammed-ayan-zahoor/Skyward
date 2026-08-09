@@ -23,8 +23,8 @@ export function Hero() {
           {/* Animated Title Block */}
           {shouldReduceMotion ? (
             <div>
-              <h1 className="mb-6 max-w-4xl text-4xl font-heading tracking-tight md:text-6xl lg:mb-12 md:leading-none">
-                STRUCTURAL CANOPIES ENGINEERED FOR THE FUEL SECTOR.
+              <h1 className="mb-6 max-w-5xl text-4xl font-heading tracking-tight md:text-6xl lg:mb-12 md:leading-none">
+                PRE-ENGINEERED STEEL STRUCTURES, WAREHOUSES & COMMERCIAL CANOPIES.
               </h1>
               <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                 <Link
@@ -32,7 +32,7 @@ export function Hero() {
                   className="rounded-[4px] bg-accent hover:bg-amber-600 px-8 py-4 text-center font-semibold text-white flex items-center justify-center gap-2 shadow-sm font-sans"
                 >
                   <Folder className="w-5 h-5" weight="Filled" />
-                  Explore Installations
+                  Explore Projects
                 </Link>
                 <Link
                   href="/#contact"
@@ -49,9 +49,9 @@ export function Hero() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={transition}
-                className="mb-6 max-w-4xl text-4xl font-heading tracking-tight md:text-6xl lg:mb-12 md:leading-none"
+                className="mb-6 max-w-5xl text-4xl font-heading tracking-tight md:text-6xl lg:mb-12 md:leading-none"
               >
-                STRUCTURAL CANOPIES ENGINEERED FOR THE FUEL SECTOR.
+                PRE-ENGINEERED STEEL STRUCTURES, WAREHOUSES & COMMERCIAL CANOPIES.
               </motion.h1>
               
               {/* Animated Button Group */}
@@ -66,7 +66,7 @@ export function Hero() {
                   className="rounded-[4px] bg-accent hover:bg-amber-600 px-8 py-4 text-center font-semibold text-white transition-colors duration-150 flex items-center justify-center gap-2 shadow-sm font-sans"
                 >
                   <Folder className="w-5 h-5" weight="Filled" />
-                  Explore Installations
+                  Explore Projects
                 </Link>
                 <Link
                   href="/#contact"
@@ -101,9 +101,7 @@ export function Hero() {
             {/* Divider */}
             <div className="my-6 w-16 border-t-2 border-accent"></div>
             <p className="text-base text-slate-muted font-sans leading-relaxed">
-              Skyward is a premier B2B structural canopy fabricator serving independent petrol stations and major oil companies. 
-              We build heavy-duty wind-rated steel canopy structures designed for maximum durability, visual appeal, and swift on-site installation. 
-              From double-cantilever highway plazas to flat-roof forecourts, our designs integrate seamless water drainage, electrical conduit routing, and certified lighting layouts.
+              Skyward is a premier B2B structural fabricator specializing in Pre-Engineered Buildings (PEB), high-capacity industrial warehouses, petrol station canopies, and heavy structural steelwork. We deliver wind-rated, heavy-duty steel structures engineered for maximum durability, structural integrity, and swift on-site assembly for commercial, industrial, and fuel sector clients.
             </p>
           </div>
           
