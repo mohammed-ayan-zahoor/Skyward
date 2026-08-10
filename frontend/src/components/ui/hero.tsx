@@ -105,11 +105,11 @@ export function Hero() {
             </p>
           </div>
           
-          {/* Image - high quality gas station canopy photo */}
+          {/* Image - high quality structural steel PEB / canopy photo */}
           {shouldReduceMotion ? (
             <img
-              src="https://petrolpumpcanopy.in/wp-content/uploads/2025/08/iocl-pump-canopy.jpg"
-              alt="IOCL petrol station canopy by Skyward"
+              src="/hero-construction.jpg"
+              alt="Pre-engineered steel structure by Skyward"
               className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[480px] object-cover md:absolute md:mt-0 md:h-[480px] md:bottom-0 md:right-0"
             />
           ) : (
@@ -117,8 +117,8 @@ export function Hero() {
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ ...transition, delay: 0.25 }}
-              src="https://petrolpumpcanopy.in/wp-content/uploads/2025/08/iocl-pump-canopy.jpg"
-              alt="IOCL petrol station canopy by Skyward"
+              src="/hero-construction.jpg"
+              alt="Pre-engineered steel structure by Skyward"
               className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[480px] object-cover md:absolute md:mt-0 md:h-[480px] md:bottom-0 md:right-0"
             />
           )}
