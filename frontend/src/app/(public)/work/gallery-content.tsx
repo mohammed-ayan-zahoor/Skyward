@@ -21,35 +21,22 @@ interface ApiInstallation {
   photos: { imageUrl: string; caption?: string }[];
 }
 
+interface ApiProduct {
+  id: string;
+  title: string;
+  slug: string;
+  category: string;
+  description?: string;
+  specifications?: string;
+  status: string;
+  photos?: { imageUrl: string; caption?: string }[];
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   peb: "PEB Structure",
   warehouse: "Warehouse",
   other: "Other Structural Work",
 };
-
-const staticProducts = [
-  {
-    id: "prod-peb-columns",
-    title: "Heavy-Duty PEB Steel Columns",
-    type: "Structural Material",
-    description: "Grade 350 structural steel columns pre-engineered with internal utility channels for electrical and drainage lines.",
-    imageUrl: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&h=450&q=80",
-  },
-  {
-    id: "prod-fascia-sheets",
-    title: "Curved Aluminum Canopy Fascia Sheets",
-    type: "Fascia Panel",
-    description: "Corrosion-resistant powder-coated aluminum fascia sheets available in custom oil major corporate colors.",
-    imageUrl: "https://images.unsplash.com/photo-1581094288338-2314dddb7ecc?auto=format&fit=crop&w=600&h=400&q=80",
-  },
-  {
-    id: "prod-led-lights",
-    title: "High-Lumen Cleanroom LED Underdeck Lights",
-    type: "Lighting Fixture",
-    description: "IP66 dust and moisture-proof recessed LED lights designed specifically for petrol station underdeck mounts.",
-    imageUrl: "https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&w=600&h=400&q=80",
-  },
-];
 
 export function GalleryContent() {
   const searchParams = useSearchParams();
@@ -57,13 +44,23 @@ export function GalleryContent() {
   const activeCategory = searchParams.get("category");
 
   const [works, setWorks] = useState<ApiInstallation[]>([]);
+  const [products, setProducts] = useState<ApiProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API}/api/installations`)
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data) => setWorks(data))
-      .catch(() => setWorks([]))
+    setLoading(true);
+    Promise.all([
+      fetch(`${API}/api/installations`).then((r) => (r.ok ? r.json() : [])),
+      fetch(`${API}/api/products`).then((r) => (r.ok ? r.json() : [])),
+    ])
+      .then(([worksData, productsData]) => {
+        setWorks(worksData);
+        setProducts(productsData);
+      })
+      .catch(() => {
+        setWorks([]);
+        setProducts([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -164,40 +161,65 @@ export function GalleryContent() {
 
       {/* Grid Display */}
       {activeTab === "products" ? (
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
-          {staticProducts.map((item, index) => (
-            <ScrollReveal
-              key={item.id}
-              direction="up"
-              duration={0.6}
-              delay={index * 0.05}
-              className="break-inside-avoid mb-6"
-            >
-              <div className="bg-white border border-slate-muted/15 rounded-[2px] p-4 flex flex-col gap-3 group transition-all duration-150 shadow-none hover:border-slate-muted/30">
-                <div className="relative overflow-hidden rounded-[2px]">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="w-full h-auto object-cover rounded-[2px] transition-transform duration-300 group-hover:scale-102"
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <h3 className="font-heading font-bold text-lg uppercase tracking-tight text-slate-900 leading-tight group-hover:text-accent transition-colors duration-150">
-                    {item.title}
-                  </h3>
-                </div>
-                <p className="text-xs text-slate-600 font-sans leading-relaxed">
-                  {item.description}
-                </p>
-                <div className="h-px w-full bg-slate-muted/10"></div>
-                <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
-                  <Setting className="w-3.5 h-3.5 text-slate-400" weight="Filled" />
-                  <span>{item.type}</span>
-                </div>
-              </div>
-            </ScrollReveal>
-          ))}
-        </div>
+        loading ? (
+          <div className="py-20 text-center font-mono text-sm text-slate-400 uppercase tracking-widest">
+            Loading products catalog...
+          </div>
+        ) : products.length === 0 ? (
+          <div className="py-20 text-center text-slate-500 font-sans text-sm">
+            No product records found in the catalog.
+          </div>
+        ) : (
+          <div className="columns-1 sm:columns-2 lg:columns-3 gap-6 [column-fill:_balance]">
+            {products.map((item, index) => {
+              const coverUrl = item.photos && item.photos[0]?.imageUrl
+                ? (item.photos[0].imageUrl.startsWith("http") ? item.photos[0].imageUrl : `${API}${item.photos[0].imageUrl}`)
+                : "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&h=450&q=80";
+
+              const catType = CATEGORY_LABELS[item.category] || item.category;
+
+              return (
+                <ScrollReveal
+                  key={item.id}
+                  direction="up"
+                  duration={0.6}
+                  delay={index * 0.05}
+                  className="break-inside-avoid mb-6"
+                >
+                  <div className="bg-white border border-slate-muted/15 rounded-[2px] p-4 flex flex-col gap-3 group transition-all duration-150 shadow-none hover:border-slate-muted/30">
+                    <div className="relative overflow-hidden rounded-[2px]">
+                      <img
+                        src={coverUrl}
+                        alt={item.title}
+                        className="w-full h-auto object-cover rounded-[2px] transition-transform duration-300 group-hover:scale-102"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-heading font-bold text-lg uppercase tracking-tight text-slate-900 leading-tight group-hover:text-accent transition-colors duration-150">
+                        {item.title}
+                      </h3>
+                    </div>
+                    {item.description && (
+                      <p className="text-xs text-slate-600 font-sans leading-relaxed">
+                        {item.description}
+                      </p>
+                    )}
+                    {item.specifications && (
+                      <p className="text-[11px] text-slate-500 font-mono leading-relaxed bg-slate-50 p-2 rounded-[2px] border border-slate-100">
+                        Spec: {item.specifications}
+                      </p>
+                    )}
+                    <div className="h-px w-full bg-slate-muted/10"></div>
+                    <div className="flex items-center gap-1 text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                      <Setting className="w-3.5 h-3.5 text-slate-400" weight="Filled" />
+                      <span>{catType}</span>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        )
       ) : loading ? (
         <div className="py-20 text-center font-mono text-sm text-slate-400 uppercase tracking-widest">
           Loading installations registry...

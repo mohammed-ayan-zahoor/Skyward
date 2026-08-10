@@ -4,6 +4,14 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Skyward | Structural Canopies",
   description: "High-span steel and aluminum canopies engineered for petrol stations and commercial sites.",
+  icons: {
+    icon: [
+      { url: "/fav.png", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/fav.png",
+    apple: "/fav.png",
+  },
 };
 
 export default function RootLayout({

@@ -12,7 +12,7 @@ export function Footer() {
             <img 
               src="/logo.png" 
               alt="Skyward Logo" 
-              className="h-16 w-auto object-contain select-none" 
+              className="h-20 md:h-28 w-auto object-contain select-none" 
             />
           </Link>
           

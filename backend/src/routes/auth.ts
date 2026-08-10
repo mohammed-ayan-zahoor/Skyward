@@ -18,8 +18,18 @@ router.post('/login', async (req: Request, res: Response) => {
   }
 
   try {
-    // Find user in db
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    const formattedEmail = email.trim().toLowerCase();
+    let user = await User.findOne({ email: formattedEmail });
+
+    // Fallback: If DB hasn't been seeded yet, auto-create default admin user on first login attempt
+    if (!user && formattedEmail === 'admin@skywardcanopies.com') {
+      const passwordHash = await bcrypt.hash('Sky@563119', 10);
+      user = await User.create({
+        email: 'admin@skywardcanopies.com',
+        passwordHash,
+        role: 'admin',
+      });
+    }
 
     if (!user) {
       res.status(401).json({ error: 'Invalid email or password' });
