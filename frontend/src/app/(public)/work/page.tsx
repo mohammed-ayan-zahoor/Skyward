@@ -3,8 +3,17 @@ import type { Metadata } from "next";
 import { GalleryContent } from "./gallery-content";
 
 export const metadata: Metadata = {
-  title: "Project Gallery — Skyward Structural Canopies",
-  description: "Browse PEB structures, warehouses, and other structural canopy work by Skyward for Indian Oil, BPCL, HPCL, Nayara, and Reliance.",
+  title: "Project Gallery — PEB, Warehouses & Petrol Station Canopies",
+  description:
+    "Browse completed PEB industrial buildings, high-capacity logistic warehouses, and petrol station canopy installations by Skyward for HPCL, BPCL, Indian Oil, Nayara, and independent fuel retailers across Karnataka.",
+  alternates: { canonical: "https://skywardcanopies.com/work" },
+  openGraph: {
+    title: "Project Gallery — PEB, Warehouses & Petrol Station Canopies | Skyward",
+    description:
+      "Browse completed PEB industrial buildings, logistic warehouses, and petrol station canopy installations by Skyward. Certified steel fabrication for HPCL, BPCL, Indian Oil & independents.",
+    url: "https://skywardcanopies.com/work",
+    images: [{ url: "/hero-construction.jpg", width: 1200, height: 630, alt: "Skyward Project Gallery" }],
+  },
 };
 
 export default function GalleryPage() {

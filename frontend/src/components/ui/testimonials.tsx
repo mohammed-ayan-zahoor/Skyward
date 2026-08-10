@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { QuoteUp, Star } from "reicon-react";
 
 interface TestimonialItem {
@@ -68,10 +69,12 @@ export function Testimonials() {
               {/* Card Header (Client Profile) */}
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center">
-                  <img 
-                    src={item.avatarUrl} 
-                    alt={item.name} 
-                    className="mr-3 inline-block h-10 w-10 rounded-full object-cover border border-slate-muted/20" 
+                  <Image
+                    src={item.avatarUrl}
+                    alt={item.name}
+                    width={40}
+                    height={40}
+                    className="mr-3 inline-block h-10 w-10 rounded-full object-cover border border-slate-muted/20"
                   />
                   <div>
                     <h6 className="text-sm font-bold text-slate-900 font-sans">{item.name}</h6>
@@ -83,11 +86,15 @@ export function Testimonials() {
               </div>
 
               {/* Large Card Image */}
-              <img 
-                src={item.imageUrl} 
-                alt={`${item.name}'s installation`} 
-                className="mb-4 inline-block h-48 w-full rounded-[2px] object-cover border border-slate-muted/10" 
-              />
+              <div className="mb-4 relative h-48 w-full rounded-[2px] overflow-hidden border border-slate-muted/10">
+                <Image
+                  src={item.imageUrl}
+                  alt={`${item.name}'s installation`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
 
               {/* Testimonial Text & Rating */}
               <div className="flex w-full flex-col items-start gap-4 p-0">

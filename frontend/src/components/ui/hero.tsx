@@ -91,6 +91,8 @@ export function Hero() {
             <img
               src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a946f0be6cfa0_Frame%2048040.svg"
               alt="Scroll indicator"
+              width={40}
+              height={40}
               className="w-10 h-10 opacity-30 animate-bounce"
             />
           </div>
@@ -110,6 +112,8 @@ export function Hero() {
             <img
               src="/hero-construction.jpg"
               alt="Pre-engineered steel structure by Skyward"
+              width={480}
+              height={480}
               className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[480px] object-cover md:absolute md:mt-0 md:h-[480px] md:bottom-0 md:right-0"
             />
           ) : (
@@ -119,6 +123,8 @@ export function Hero() {
               transition={{ ...transition, delay: 0.25 }}
               src="/hero-construction.jpg"
               alt="Pre-engineered steel structure by Skyward"
+              width={480}
+              height={480}
               className="relative rounded-[2px] border border-slate-muted/20 shadow-none mt-8 w-full md:w-[480px] object-cover md:absolute md:mt-0 md:h-[480px] md:bottom-0 md:right-0"
             />
           )}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Location, Setting, Calendar, Star, ArrowRight, ShieldAlert, Download, CheckCircle, Phone } from "reicon-react";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
@@ -124,10 +125,13 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
             
             {/* Primary Main Viewport */}
             <div className="relative aspect-[4/3] w-full bg-slate-900 border border-slate-muted/20 rounded-[2px] overflow-hidden shadow-sm group">
-              <img
+              <Image
                 src={activePhotoUrl}
                 alt={selectedPhoto?.caption || project.title}
-                className="w-full h-full object-cover transition-opacity duration-300"
+                fill
+                priority
+                className="object-cover transition-opacity duration-300"
+                sizes="(max-width: 1024px) 100vw, 700px"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-90 pointer-events-none" />
               
@@ -165,10 +169,12 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                             : "border-slate-muted/25 opacity-75 hover:opacity-100 hover:border-slate-400"
                         }`}
                       >
-                        <img
+                        <Image
                           src={thumbUrl}
                           alt={photo.caption || `Thumbnail ${idx + 1}`}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover"
+                          sizes="80px"
                         />
                         {photo.isCover && (
                           <span className="absolute top-1 left-1 bg-primary text-white text-[8px] font-mono px-1 py-0.2 rounded-[1px] uppercase tracking-tighter">
@@ -329,10 +335,12 @@ export function ProjectDetailClient({ project, relatedProjects }: ProjectDetailC
                       className="bg-white border border-slate-muted/15 rounded-[2px] p-4 flex flex-col gap-3 group transition-all hover:border-slate-muted/30 hover:shadow-xs"
                     >
                       <div className="relative aspect-[4/3] overflow-hidden rounded-[2px]">
-                        <img
+                        <Image
                           src={relCover}
                           alt={rel.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102"
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-102"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 350px"
                         />
                       </div>
                       <div className="flex flex-col gap-1">

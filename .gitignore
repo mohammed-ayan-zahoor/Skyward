@@ -1,0 +1,16 @@
+# Agent workspace local folder
+.agents/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories (handled in subdirectories)
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db

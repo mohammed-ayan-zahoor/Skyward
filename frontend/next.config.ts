@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "assets.website-files.com" },
+      { protocol: "http", hostname: "127.0.0.1", port: "7001" },
+      { protocol: "http", hostname: "localhost", port: "7001" },
+    ],
+  },
 };
 
 export default nextConfig;

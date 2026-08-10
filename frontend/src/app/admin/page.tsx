@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { BrowserTerminal, ShieldCheck } from "reicon-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "";
@@ -48,10 +49,16 @@ export default function AdminLoginPage() {
   return (
     <main className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden select-none">
       {/* Blurred Industrial Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center blur-[8px] brightness-[0.35] contrast-[1.15] scale-105 z-0"
-        style={{ backgroundImage: `url(${bgImage})` }}
-      />
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <Image
+          src={bgImage}
+          alt="Industrial Background"
+          fill
+          priority
+          className="object-cover blur-[8px] brightness-[0.35] contrast-[1.15] scale-105"
+          sizes="100vw"
+        />
+      </div>
       <div className="absolute inset-0 bg-[#1C2B36]/45 mix-blend-multiply z-0 pointer-events-none" />
 
       {/* Login Console */}

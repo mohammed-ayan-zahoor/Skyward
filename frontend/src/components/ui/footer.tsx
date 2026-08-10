@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function Footer() {
   return (
@@ -9,10 +10,12 @@ export function Footer() {
         <div className="flex-col flex items-center">
           {/* Branded Company Logo */}
           <Link href="/" className="mb-8 inline-block max-w-full">
-            <img 
-              src="/logo.png" 
-              alt="Skyward Logo" 
-              className="h-20 md:h-28 w-auto object-contain select-none" 
+            <Image
+              src="/logo.png"
+              alt="Skyward Logo"
+              width={265}
+              height={65}
+              className="h-20 md:h-28 w-auto object-contain select-none"
             />
           </Link>
           
@@ -40,17 +43,17 @@ export function Footer() {
           
           {/* Social media grid */}
           <div className="mb-12 grid grid-cols-4 max-w-52 gap-8 mx-auto opacity-60 hover:opacity-90 transition-opacity duration-150">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
-              <img src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a945b4ae6cf7b_Vector-1.svg" alt="Twitter" className="inline-block invert opacity-80 hover:opacity-100" />
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Skyward on Twitter" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
+              <Image src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a945b4ae6cf7b_Vector-1.svg" alt="Twitter" width={24} height={24} className="inline-block invert opacity-80 hover:opacity-100" />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
-              <img src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a945560e6cf77_Vector.svg" alt="Facebook" className="inline-block invert opacity-80 hover:opacity-100" />
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Skyward on Facebook" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
+              <Image src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a945560e6cf77_Vector.svg" alt="Facebook" width={24} height={24} className="inline-block invert opacity-80 hover:opacity-100" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
-              <img src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a940535e6cf7a_Vector-3.svg" alt="Instagram" className="inline-block invert opacity-80 hover:opacity-100" />
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Skyward on Instagram" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
+              <Image src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a940535e6cf7a_Vector-3.svg" alt="Instagram" width={24} height={24} className="inline-block invert opacity-80 hover:opacity-100" />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
-              <img src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a9433a9e6cf88_Vector-2.svg" alt="LinkedIn" className="inline-block invert opacity-80 hover:opacity-100" />
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Skyward on LinkedIn" className="mx-auto flex-col flex max-w-6 items-center justify-center text-slate-400 hover:text-accent transition-colors duration-150">
+              <Image src="https://assets.website-files.com/6458c625291a94a195e6cf3a/6458c625291a9433a9e6cf88_Vector-2.svg" alt="LinkedIn" width={24} height={24} className="inline-block invert opacity-80 hover:opacity-100" />
             </a>
           </div>
           

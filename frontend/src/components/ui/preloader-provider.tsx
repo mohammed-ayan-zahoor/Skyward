@@ -127,6 +127,8 @@ export function PreloaderProvider({ children }: { children: React.ReactNode }) {
               <img
                 src="/logo.png"
                 alt="Skyward Logo"
+                width={265}
+                height={65}
                 className="h-32 md:h-40 w-auto object-contain select-none mb-6"
               />
               

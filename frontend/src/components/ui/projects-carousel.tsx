@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, ArrowRight } from "reicon-react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "";
@@ -213,10 +214,12 @@ export function ProjectsCarousel() {
                     </div>
 
                     {/* Background Image */}
-                    <img
+                    <Image
                       src={coverUrl}
                       alt={project.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300 rounded-[2px]"
+                      fill
+                      className="object-cover group-hover:scale-102 transition-transform duration-300 rounded-[2px]"
+                      sizes="(max-width: 768px) 310px, 320px"
                     />
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-transparent" />

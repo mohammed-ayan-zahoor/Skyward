@@ -33,17 +33,51 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
+  const canonicalUrl = `https://skywardcanopies.com/work/${id}`;
+
   try {
     const res = await fetch(`${API}/api/installations/${id}`, { cache: "no-store" });
     if (res.ok) {
       const project: Installation = await res.json();
+      const firstPhoto = project.photos.find((p) => p.isCover) || project.photos[0];
+      const imageUrl = firstPhoto 
+        ? (firstPhoto.imageUrl.startsWith("http") ? firstPhoto.imageUrl : `${API}${firstPhoto.imageUrl}`)
+        : "https://skywardcanopies.com/hero-construction.jpg";
+
       return {
-        title: `${project.title} — Skyward Canopies`,
-        description: project.description || "Structural canopy installation by Skyward.",
+        title: `${project.title} — PEB & Canopy Installation Registry`,
+        description: project.description || `Case study detailing structural steel PEB/canopy fabrication and installation for ${project.brand || "Independent Retailer"} by Skyward.`,
+        alternates: {
+          canonical: canonicalUrl,
+        },
+        openGraph: {
+          title: `${project.title} | Skyward Structural Canopies`,
+          description: project.description || `Case study detailing structural steel PEB/canopy fabrication and installation.`,
+          url: canonicalUrl,
+          images: [
+            {
+              url: imageUrl,
+              width: 1200,
+              height: 900,
+              alt: project.title,
+            },
+          ],
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: `${project.title} | Skyward Structural Canopies`,
+          description: project.description || `Case study detailing structural steel PEB/canopy fabrication and installation.`,
+          images: [imageUrl],
+        },
       };
     }
   } catch {}
-  return { title: "Installation Detail — Skyward Canopies" };
+  return { 
+    title: "Installation Detail — Skyward Canopies",
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
 }
 
 export default async function ProjectDetailPage({ params }: PageProps) {

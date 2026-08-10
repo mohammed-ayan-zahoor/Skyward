@@ -651,7 +651,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-10 bg-slate-100 rounded-[2px] border border-slate-200 overflow-hidden shrink-0">
                                 {coverUrl ? (
-                                  <img src={coverUrl} alt={w.title} className="w-full h-full object-cover" />
+                                  <img src={coverUrl} alt={w.title} width={48} height={40} className="w-full h-full object-cover" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center font-mono text-[8px] text-slate-400">NO IMG</div>
                                 )}
@@ -742,7 +742,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-10 bg-slate-100 rounded-[2px] border border-slate-200 overflow-hidden shrink-0">
                                 {coverUrl ? (
-                                  <img src={coverUrl} alt={p.title} className="w-full h-full object-cover" />
+                                  <img src={coverUrl} alt={p.title} width={48} height={40} className="w-full h-full object-cover" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center font-mono text-[8px] text-slate-400">NO IMG</div>
                                 )}
