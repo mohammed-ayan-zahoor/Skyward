@@ -15,6 +15,7 @@ const localBusinessSchema = {
   url: "https://skywardkgf.com",
   telephone: "+91-99163-39916",
   email: "skywardkgf@gmail.com",
+  priceRange: "₹₹₹",
   address: {
     "@type": "PostalAddress",
     streetAddress: "#27, Krishnageri Lane, Marikuppam Post",
@@ -36,9 +37,47 @@ const localBusinessSchema = {
       closes: "18:00",
     },
   ],
-  areaServed: {
-    "@type": "State",
-    name: "Karnataka",
+  areaServed: [
+    { "@type": "State", name: "Karnataka" },
+    { "@type": "City", name: "Bangalore" },
+    { "@type": "City", name: "Kolar" },
+    { "@type": "City", name: "K.G.F." }
+  ],
+  knowsAbout: [
+    "Petrol Station Canopy Fabrication",
+    "Pre-Engineered Buildings (PEB)",
+    "Industrial Warehouses",
+    "Wind-Rated Steel Trusses"
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Structural Fabrication Services",
+    itemListElement: [
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Petrol Station Canopy Fabrication",
+          description: "Wind & seismic rated steel canopies for HPCL, BPCL, Indian Oil, Shell and independent outlets."
+        }
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Pre-Engineered Buildings (PEB)",
+          description: "High-span industrial steel sheds and PEB commercial structures."
+        }
+      },
+      {
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: "Logistics & Industrial Warehouses",
+          description: "Heavy steel framing, roof truss systems, and utility-integrated warehouse buildings."
+        }
+      }
+    ]
   },
   sameAs: [
     "https://facebook.com",
