@@ -22,10 +22,10 @@ router.post('/login', async (req: Request, res: Response) => {
     let user = await User.findOne({ email: formattedEmail });
 
     // Fallback: If DB hasn't been seeded yet, auto-create default admin user on first login attempt
-    if (!user && formattedEmail === 'admin@skywardcanopies.com') {
+    if (!user && formattedEmail === 'admin@skywardkgf.com') {
       const passwordHash = await bcrypt.hash('Sky@563119', 10);
       user = await User.create({
-        email: 'admin@skywardcanopies.com',
+        email: 'admin@skywardkgf.com',
         passwordHash,
         role: 'admin',
       });

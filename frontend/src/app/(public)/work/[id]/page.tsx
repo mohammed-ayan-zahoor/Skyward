@@ -33,7 +33,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const canonicalUrl = `https://skywardcanopies.com/work/${id}`;
+  const canonicalUrl = `https://skywardkgf.com/work/${id}`;
 
   try {
     const res = await fetch(`${API}/api/installations/${id}`, { cache: "no-store" });
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       const firstPhoto = project.photos.find((p) => p.isCover) || project.photos[0];
       const imageUrl = firstPhoto 
         ? (firstPhoto.imageUrl.startsWith("http") ? firstPhoto.imageUrl : `${API}${firstPhoto.imageUrl}`)
-        : "https://skywardcanopies.com/hero-construction.jpg";
+        : "https://skywardkgf.com/hero-construction.jpg";
 
       return {
         title: `${project.title} — PEB & Canopy Installation Registry`,

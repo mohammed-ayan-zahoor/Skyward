@@ -8,11 +8,11 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "GeneralContractor"],
   name: "Skyward Structural Canopies",
-  image: "https://skywardcanopies.com/logo.png",
-  logo: "https://skywardcanopies.com/logo.png",
+  image: "https://skywardkgf.com/logo.png",
+  logo: "https://skywardkgf.com/logo.png",
   description:
     "Premier B2B fabricator of pre-engineered steel buildings (PEB), industrial warehouses, and petrol station canopies in Karnataka, India. Certified for wind & seismic loads.",
-  url: "https://skywardcanopies.com",
+  url: "https://skywardkgf.com",
   telephone: "+91-99163-39916",
   email: "skywardkgf@gmail.com",
   address: {

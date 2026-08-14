@@ -8,12 +8,12 @@ export const metadata: Metadata = {
   title: "About Us — B2B Steel Canopy & PEB Fabricators, KGF Karnataka",
   description:
     "Skyward began as a structural steel fabrication team and became a premier B2B canopy partner for independent fuel retailers and major oil corporations. Wind-rated, seismic-certified structures built in KGF, Karnataka.",
-  alternates: { canonical: "https://skywardcanopies.com/about" },
+  alternates: { canonical: "https://skywardkgf.com/about" },
   openGraph: {
     title: "About Skyward — B2B Steel Canopy & PEB Fabricators, KGF Karnataka",
     description:
       "Premier B2B canopy partner for independent fuel retailers and major oil corporations. Wind-rated, seismic-certified structural steel canopies built in KGF, Karnataka.",
-    url: "https://skywardcanopies.com/about",
+    url: "https://skywardkgf.com/about",
     images: [{ url: "/hero-construction.jpg", width: 1200, height: 630, alt: "Skyward Structural Canopy Engineering" }],
   },
 };

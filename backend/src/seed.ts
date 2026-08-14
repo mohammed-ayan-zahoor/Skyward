@@ -20,7 +20,7 @@ async function seed() {
   // 2. Create default Admin User
   const passwordHash = await bcrypt.hash('Sky@563119', 10);
   const admin = await User.create({
-    email: 'admin@skywardcanopies.com',
+    email: 'admin@skywardkgf.com',
     passwordHash,
     role: 'admin',
   });

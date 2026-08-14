@@ -19,11 +19,11 @@ const connectDB = async () => {
         if (adminCount === 0) {
             const passwordHash = await bcrypt_1.default.hash('Sky@563119', 10);
             await User_1.User.create({
-                email: 'admin@skywardcanopies.com',
+                email: 'admin@skywardkgf.com',
                 passwordHash,
                 role: 'admin',
             });
-            console.log('[database]: Default admin user (admin@skywardcanopies.com) initialized.');
+            console.log('[database]: Default admin user (admin@skywardkgf.com) initialized.');
         }
         // Auto-create default products if catalog is empty
         const productCount = await Product_1.Product.countDocuments();

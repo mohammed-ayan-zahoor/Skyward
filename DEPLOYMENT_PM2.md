@@ -50,7 +50,7 @@ NEXT_PUBLIC_API_URL="https://skyward.yourdomain.com"
 
 ## Step 3: Seed Database (Creates Default Admin User)
 
-Run the Mongoose seed script to create your initial admin account (`admin@skywardcanopies.com` / `Sky@563119`) and sample installations in MongoDB:
+Run the Mongoose seed script to create your initial admin account (`admin@skywardkgf.com` / `Sky@563119`) and sample installations in MongoDB:
 
 ```bash
 cd backend
