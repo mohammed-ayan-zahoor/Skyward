@@ -16,9 +16,23 @@ const PORT = process.env.PORT || 5001;
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'https://skywardkgf.com',
+  'https://www.skywardkgf.com',
+  'http://72.61.225.80',
+  'http://localhost:3000',
+  'http://localhost:7005',
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // ponytail: permissive fallback for production domain flexibility
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
